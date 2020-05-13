@@ -19,6 +19,8 @@ public class PracticeRecordDTO
 
     private String childQbId;
 
+    private String childQbTitle;
+
     private Integer completeNumber;
 
     private List<String> userAnswerList;

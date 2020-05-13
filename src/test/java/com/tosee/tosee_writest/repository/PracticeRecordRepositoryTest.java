@@ -32,7 +32,6 @@ class PracticeRecordRepositoryTest
         if(str.endsWith("]")) str = str.replace("]","");
 
         System.out.println(str);
-//        System.out.println(Arrays.asList(str.split(",")));
         System.out.println(CollectionUtils.arrayToList(str.split(",")));
     }
 }

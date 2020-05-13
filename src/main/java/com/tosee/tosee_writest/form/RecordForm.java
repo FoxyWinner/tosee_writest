@@ -31,6 +31,5 @@ public class RecordForm
     @NotNull(message = "模式必填")
     private Integer mode;
 
-    @NotEmpty(message = "模式必填")
     private List<String> userAnswerList;
 }

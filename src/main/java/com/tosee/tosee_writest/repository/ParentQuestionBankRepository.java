@@ -17,4 +17,9 @@ public interface ParentQuestionBankRepository extends JpaRepository<ParentQuesti
 
     // 时间最新排列
     List<ParentQuestionBank> findByPositionTypeAndPqbTypeOrderByRelaseTimeDesc(Integer positionType, Integer pqbType);
+
+    // 查询行测父题库列表
+    List<ParentQuestionBank> findByPqbTypeOrderByPqbHeat(Integer pqbType);
+
+
 }

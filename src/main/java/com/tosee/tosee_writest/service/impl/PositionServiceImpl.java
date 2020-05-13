@@ -24,12 +24,12 @@ public class PositionServiceImpl implements PositionService
     private WorkPositionRepository workPositionRepository;
 
     @Override
-    public List<WorkField> findAll()
+    public List<WorkField> findAllFields()
     {
         // 这段代码意思是过滤掉行业："综合"
         List<WorkField>  allWorkFields= workFieldRepository.findAll();
         List<WorkField>  resultWorkFields = new ArrayList<>();
-        int deleteIndex;
+
         for (WorkField workField : allWorkFields)
         {
             if (workField.getFieldType() != 0 )
@@ -40,10 +40,42 @@ public class PositionServiceImpl implements PositionService
         return resultWorkFields;
     }
 
+    @Override
+    public List<WorkPosition> findAllPositions()
+    {
+        // 过滤岗位综合
+        List<WorkPosition> allPositions = workPositionRepository.findAll();
+        List<WorkPosition> resultPositions = new ArrayList<>();
+
+        for (WorkPosition workPosition : allPositions)
+        {
+            if(workPosition.getPositionType() != 0)
+            {
+                resultPositions.add(workPosition);
+            }
+        }
+
+        return resultPositions;
+    }
+
 
     @Override
     public List<WorkPosition> findByFieldType(Integer fieldType)
     {
         return workPositionRepository.findByFieldType(fieldType);
     }
+
+    @Override
+    public WorkField findFieldByType(Integer fieldType)
+    {
+        return workFieldRepository.findByFieldType(fieldType);
+    }
+
+    @Override
+    public WorkPosition findPositionByType(Integer positionType)
+    {
+        return workPositionRepository.findByPositionType(positionType);
+    }
+
+
 }

@@ -33,7 +33,7 @@ public class WritesterPositionController
         List<WorkFieldVO> workFieldVOList = new ArrayList<>();
 
         // 先查出所有的field
-        List<WorkField> workFields = positionService.findAll();
+        List<WorkField> workFields = positionService.findAllFields();
 
         for (WorkField workField : workFields)
         {

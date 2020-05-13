@@ -20,7 +20,8 @@ public class StringConvertUtil
         List<String> result = new ArrayList<>();
         for (String str : strs)
         {
-            result.add(str.trim());
+            if(str.equals("")) result.add(str);
+            else result.add(str.trim());
         }
         return result;
     }

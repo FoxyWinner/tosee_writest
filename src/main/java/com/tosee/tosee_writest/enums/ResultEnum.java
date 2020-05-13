@@ -13,15 +13,18 @@ public enum ResultEnum
 
     OPTIONS_NOT_EXIST(21,"题目的选项不存在"),
 
+    RECORD_NOT_EXIST(22,"无历史作答记录"),
+
+    SPECIAL_PRACTICE_NOT_EXIST(23,"该行业专业知识题库暂为空"),
+
+    MISTAKE_NOT_EXIST(24,"用户错题本中没有该条错题"),
+
+    MISTAKE_BOOK_NOT_EXIST(25,"用户错题本中没有该错题本"),
+
     WECHAT_MA_EMPTY_JSCODE(30, "JSCODE为空"),
 
-    WECHAT_MA_ERROR(20, "微信小程序方面错误"),
+    WECHAT_MA_ERROR(31,"微信小程序端相关错误"),
 
-    WECHAT_MP_ERROR(21,"微信扫码登录方面错误"),
-
-
-    LOGIN_FAIL(25,"登录失败，登录信息不正确"),
-    LOGOUT_SUCCESS(26, "登出成功"),
     ;
     private Integer code;
 

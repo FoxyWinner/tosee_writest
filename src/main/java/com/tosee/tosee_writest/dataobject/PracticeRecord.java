@@ -22,6 +22,8 @@ public class PracticeRecord
 
     private String childQbId;
 
+    private String childQbTitle;
+
     private Integer completeNumber;
 
     private String userAnswerList;

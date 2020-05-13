@@ -29,6 +29,7 @@ public class PracticeRecordServiceImpl implements PracticeRecordService
         // 更新
         if(practiceRecord != null)
         {
+            practiceRecord.setChildQbTitle(practiceRecordDTO.getChildQbTitle());
             practiceRecord.setComplete(practiceRecordDTO.getComplete());
             practiceRecord.setCompleteNumber(practiceRecordDTO.getCompleteNumber());
             practiceRecord.setSpentTime(practiceRecordDTO.getSpentTime());
@@ -46,6 +47,7 @@ public class PracticeRecordServiceImpl implements PracticeRecordService
             practiceRecord.setRecordId(KeyUtil.genUniqueKey());
             practiceRecord.setOpenId(practiceRecordDTO.getOpenid());
             practiceRecord.setChildQbId(practiceRecordDTO.getChildQbId());
+            practiceRecord.setChildQbTitle(practiceRecordDTO.getChildQbTitle());
             practiceRecord.setComplete(practiceRecordDTO.getComplete());
             practiceRecord.setCompleteNumber(practiceRecordDTO.getCompleteNumber());
             practiceRecord.setSpentTime(practiceRecordDTO.getSpentTime());

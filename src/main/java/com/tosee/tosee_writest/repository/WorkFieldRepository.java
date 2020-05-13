@@ -11,5 +11,5 @@ import java.util.List;
  */
 public interface WorkFieldRepository extends JpaRepository<WorkField, Integer>
 {
-
+    WorkField findByFieldType(Integer fieldType);
 }

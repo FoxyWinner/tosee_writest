@@ -12,6 +12,8 @@ import java.util.List;
 @Data
 public class ReportVO
 {
+    private String childQbTitle;
+
     private Integer correctRatio;
 
     private Integer spentTime;

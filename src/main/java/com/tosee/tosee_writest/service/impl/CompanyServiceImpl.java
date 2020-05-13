@@ -5,13 +5,17 @@ import com.tosee.tosee_writest.enums.ResultEnum;
 import com.tosee.tosee_writest.exception.WritestException;
 import com.tosee.tosee_writest.repository.CompanyRepository;
 import com.tosee.tosee_writest.service.CompanyService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @Author: FoxyWinner
  * @Date: 2020/4/29 2:07 下午
  */
+@Slf4j
 @Service
 public class CompanyServiceImpl implements CompanyService
 {
@@ -29,5 +33,20 @@ public class CompanyServiceImpl implements CompanyService
         }
 
         return company .getCompanyIcon();
+    }
+
+    @Override
+    public Company findCompanyById(Integer companyId)
+    {
+        log.info("【查询公司】id{}",companyId);
+        Company company = companyRepository.findById(companyId).orElse(null);
+
+        return company;
+    }
+
+    @Override
+    public List<Company> findAllCompanies()
+    {
+        return companyRepository.findAll();
     }
 }

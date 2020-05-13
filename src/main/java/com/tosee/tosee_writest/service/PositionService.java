@@ -11,7 +11,13 @@ import java.util.List;
  */
 public interface PositionService
 {
-    List<WorkField> findAll();
+    List<WorkField> findAllFields();
+
+    List<WorkPosition> findAllPositions();
 
     List<WorkPosition> findByFieldType(Integer fieldType);
+
+    WorkField findFieldByType(Integer fieldType);
+
+    WorkPosition findPositionByType(Integer positionType);
 }

@@ -12,4 +12,6 @@ import java.util.List;
 public interface WorkPositionRepository extends JpaRepository<WorkPosition, Integer>
 {
     List<WorkPosition> findByFieldType(Integer fieldType);
+
+    WorkPosition findByPositionType(Integer positionType);
 }
