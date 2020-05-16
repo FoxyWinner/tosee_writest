@@ -180,6 +180,7 @@ size: 10 //每页所含条目大小，该字段可不传，服务器端默认siz
           	"questionNumber":10,
             "title": "商业模式",
 						"heat": 1000,
+          	"complete":0,//上次已完成的话是1
           	"completeNumber": 0, // 直接传数字，上次做了几道题
           	"correct": -1,
             "collectState": 1, //未收藏
@@ -192,6 +193,7 @@ size: 10 //每页所含条目大小，该字段可不传，服务器端默认siz
           	"questionNumber":10,
             "title": "技术名词",
 						"heat": 800,
+          	"complete":0,//上次已完成的话是1
           	"completeNumber": 2,
           	"correct": -1,
             "collectState": 0 ,//已收藏
@@ -244,6 +246,7 @@ size: 10 //每页所含条目大小，该字段可不传，服务器端默认siz
               "questionNumber":10,
               "title": "数量关系子题库1",
               "heat": 1000,
+              "complete":0,//上次已完成的话是1
               "completeNumber": 0, // 直接传数字，上次做了几道题
               "correct": -1,
               "collectState": 1, //未收藏
@@ -256,6 +259,7 @@ size: 10 //每页所含条目大小，该字段可不传，服务器端默认siz
                 "questionNumber":10,
                 "title": "数量关系子题库2",
                 "heat": 800,
+             		"complete":0,//上次已完成的话是1
                 "completeNumber": 2,
                 "correct": -1,
                 "collectState": 0 ,
@@ -276,6 +280,7 @@ size: 10 //每页所含条目大小，该字段可不传，服务器端默认siz
                 "questionNumber":10,
                 "title": "常识判断子题库1",
                 "heat": 1000,
+                "complete":0,//上次已完成的话是1
                 "completeNumber": 0, // 直接传数字，上次做了几道题
                 "correct": -1,
                 "collectState": 1, //未收藏
@@ -288,6 +293,7 @@ size: 10 //每页所含条目大小，该字段可不传，服务器端默认siz
                   "questionNumber":10,
                   "title": "常识判断子题库2",
                   "heat": 800,
+                	"complete":0,//上次已完成的话是1
                   "completeNumber": 2,
                   "correct": -1,
                   "collectState": 0 ,
@@ -338,6 +344,7 @@ size: 10 //每页所含条目大小，该字段可不传，服务器端默认siz
             "childQbId":"123457",
           	"questionNumber":30,
             "title": "阿里巴巴2020校招游戏策划类",
+          	"complete":0,//上次已完成的话是1
 						"heat": 800,
           	"completeNumber": 5, // 直接传数字，做了几道题
           	"correct": 80,
@@ -351,6 +358,7 @@ size: 10 //每页所含条目大小，该字段可不传，服务器端默认siz
           	"questionNumber":20,
             "title": "阿里巴巴2020校招游戏策划类",
 						"heat": 800,
+          	"complete":0,//上次已完成的话是1
           	"completeNumber": 80,
           	"correct": 80,
             "collectState": 1 ,//已收藏
@@ -694,7 +702,7 @@ Response_description:略
 
 ## 复习篇
 
-### 首页推荐列表
+### 首页推荐列表✅
 
 我先暂时把编辑推荐位的子题库列表发给你；
 
@@ -703,7 +711,7 @@ Response_description:略
 - 用户做过
 - 推荐位
 
-现在还没做。
+但现在是只显示运营推荐子题库列表（这个推荐是全局的，而不是根据openid客制化的）
 
 ```http
 GET /writester/review/recommendlist
@@ -731,6 +739,7 @@ size: 10 //每页所含条目大小，该字段可不传，服务器端默认siz
           	"questionNumber":30,
             "title": "复习推荐题库1",
 						"heat": 800,
+          	"complete":0,//上次已完成的话是1
           	"completeNumber": 5, // 直接传数字，做了几道题
           	"correct": 80,
             "collectState": 0, //未收藏
@@ -743,6 +752,7 @@ size: 10 //每页所含条目大小，该字段可不传，服务器端默认siz
           	"questionNumber":20,
             "title": "复习推荐题库2",
 						"heat": 800,
+          	"complete":0,
           	"completeNumber": 80,
           	"correct": 80,
             "collectState": 1 ,//已收藏
@@ -754,7 +764,7 @@ size: 10 //每页所含条目大小，该字段可不传，服务器端默认siz
 }
 ```
 
-### 收藏夹（未完成设计）
+### 收藏夹列表✅
 
 ```http
 GET /writester/review/collectlist
@@ -807,9 +817,9 @@ size: 10 //每页所含条目大小，该字段可不传，服务器端默认siz
 }
 ```
 
-当type为2时，返回收藏题目列表（仍以子题库列表形式呈现）**（未完成设计）**：
+当type为2时，返回收藏题目列表（仍以子题库列表形式呈现）：
 
-这种情形应该走和错题本一样的虚拟子题库设计
+（和错题本一样的虚拟子题库设计）
 
 ``` json
 {
@@ -830,6 +840,69 @@ size: 10 //每页所含条目大小，该字段可不传，服务器端默认siz
 ```
 
 当type为3时，返回收藏文章列表：**暂无**
+
+### 收藏夹题目练习✅
+
+```http
+GET /writester/review/docollectquestion
+```
+
+参数
+
+```json
+openid: on62f4kYUBt-AvuY11BcNNsCE4Ko
+collectBookId:"123457"
+```
+
+返回
+
+``` json
+{
+    "code": 0,
+    "msg": "成功",
+    "data": [
+			{
+        {
+            "collectQuestionId": "15895989496241410320",
+            "collectQuestionSeq": 1,
+            "questionId": "15881323384921812124",
+            "questionType": 3,
+            "questionStem": "TEST，问答题",
+            "answer": "我是TEST问答题的答案",
+            "explanation": "问答题测试用例",
+            "collectState": 1
+        },
+        {
+            "collectQuestionId": "15895993468541748387",
+            "collectQuestionSeq": 2,
+            "questionId": "15882183451931833108",
+            "questionType": 1,
+            "questionStem": "“80 后”这个词，最早于 2001 年出现在网络论坛中，指的是一批活跃于网络论坛的出生于 20 世纪 80 年代的诗人。2003 年开始，它更多指的是一批被商业运作出名的生于 1980 年以后的写手。2004 年底，随着“80 后作家”的批量涌现，这个词逐渐被用来指称整个 20 世纪 80 年代出生的年轻人群体。最适合做这段文字标题的是（ ）。",
+            "answer": "B",
+            "explanation": "文段脉络清晰，首先介绍了“80 后”这个词在 2001 年是何意，接着以时间为维度说明“80 后”在 2003 年、2004 年的词意变化，可以看出，文段主要阐述的是“80 后”的由来。因此，本题选择 B 选项",
+            "collectState": 1,
+            "questionOptions": [
+                {
+                    "optionName": "A",
+                    "optionValue": "“充满希望”的一代"
+                },
+                {
+                    "optionName": "B",
+                    "optionValue": "“80 后”的由来"
+                },
+                {
+                    "optionName": "C",
+                    "optionValue": "用新视角理性看待“80 后”"
+                },
+                {
+                    "optionName": "D",
+                    "optionValue": "“80 后”引起社会的广泛关注"
+                }
+            ]
+        }
+    ]
+}
+```
 
 ### 错题本列表✅
 
@@ -870,7 +943,7 @@ Response_description:略
 
 ### 错题练习✅
 
-//应该返回的题目列表里题目id为mistakeId，这个mistakeId就像一个指针一样指向question
+mistakeId就像一个指针一样指向question
 
 ```http
 GET /writester/review/domistake
@@ -947,10 +1020,10 @@ questionId:"15887760531851311111"
 
 
 
-### 练习记录
+### 练习记录✅
 
 ```http
-GET /writester/review/practicerecord
+GET /writester/review/recordlist
 ```
 
 参数
@@ -991,10 +1064,10 @@ size: 10 //每页所含条目大小，该字段可不传，服务器端默认siz
 
 Response_description:略
 
-### 练习记录删除
+### 练习记录删除✅
 
 ```http
-POST /writester/review/deleterecord
+POST /writester/review/recorddelete
 ```
 
 参数

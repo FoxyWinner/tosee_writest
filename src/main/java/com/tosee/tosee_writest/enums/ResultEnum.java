@@ -21,9 +21,16 @@ public enum ResultEnum
 
     MISTAKE_BOOK_NOT_EXIST(25,"用户错题本中没有该错题本"),
 
+    COLLECT_BOOK_NOT_EXIST(26,"用户收藏集中没有该题目收藏集"),
+
+    COLLECT_QUESTION_NOT_EXIST(27,"用户收藏集中没有该题目"),
+
+
     WECHAT_MA_EMPTY_JSCODE(30, "JSCODE为空"),
 
     WECHAT_MA_ERROR(31,"微信小程序端相关错误"),
+
+    EXCEED_AUTHORITY(40,"横向越权错误"),
 
     ;
     private Integer code;

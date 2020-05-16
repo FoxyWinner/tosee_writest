@@ -33,6 +33,10 @@ public interface QuestionBankService
     /** 根据父题库ID 查询子题库列表 */
     List<ChildQuestionBank> findCQBListByPQBIdOrderBy(String parentQbId, QuestionBankSortEnum sortRule);
 
+    ChildQuestionBank findCQBById(String childQbId);
+
+    List<ChildQuestionBank> findRecommendedCQB(String openid);
+
     /** 根据子题库ID 查询题目列表 */
     List<QuestionDTO> findQuestionListByCQBId(String childQbId);
 
@@ -49,6 +53,8 @@ public interface QuestionBankService
 
      Integer getQuestionNumber(String childQbId);
 
+     Integer getSimulationTime(String childQbId);
+
      String getCQbTitle(String childQbId);
 
      /** 为某套子题库热度++，顺便重新计算父题库热度*/
@@ -58,16 +64,29 @@ public interface QuestionBankService
     // 以下为运营用
 
     /** 获取父题库列表 */
-    public Page<ParentQuestionBankDTO> findPQBList(Pageable pageable);
+    Page<ParentQuestionBankDTO> findPQBList(Pageable pageable);
 
-    public ParentQuestionBankDTO findOneParentQuestionBankDTO(String pqbId);
+    /** 获取子题库列表 */
+    Page<ChildQuestionBank> findCQBList(Pageable pageable);
 
-    public ParentQuestionBank findOneParentQuestionBank(String pqbId);
+    Page<ChildQuestionBank> findCQBList(Pageable pageable,String pqbId);
 
-    public ParentQuestionBank saveParentQuestionBankDTO(ParentQuestionBankDTO parentQuestionBankDTO);
+    List<ChildQuestionBank> findAllCQBs();
 
-    public ParentQuestionBank saveParentQuestionBank(ParentQuestionBank parentQuestionBank);
+    Page<QuestionDTO> findQuestionsDTOList(Pageable pageable);
 
-    public ChildQuestionBank findById(String childQbId);
+    Page<QuestionDTO> findQuestionsDTOList(Pageable pageable,String cqbId);
+
+    ParentQuestionBankDTO findOneParentQuestionBankDTO(String pqbId);
+
+    ParentQuestionBank findOneParentQuestionBank(String pqbId);
+
+    ParentQuestionBank saveParentQuestionBankDTO(ParentQuestionBankDTO parentQuestionBankDTO);
+
+    ParentQuestionBank saveParentQuestionBank(ParentQuestionBank parentQuestionBank);
+
+    ChildQuestionBank findById(String childQbId);
+
+    List<ParentQuestionBankDTO> findAllPQB();
 
 }

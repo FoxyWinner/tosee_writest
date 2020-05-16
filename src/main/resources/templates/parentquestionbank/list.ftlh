@@ -23,7 +23,7 @@
                             <th>推荐</th>
                             <th>热度</th>
                             <th>发布时间</th>
-                            <th colspan="2">操作</th>
+                            <th colspan="3">操作</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -51,6 +51,10 @@
                                 <td>
                                     <a href="/toseewritest/operator/questionbank/pqbrecommend?parentQbId=${parentQuestionBankDTO.parentQbId}">推荐</a>
                                 </td>
+
+                                <td>
+                                    <a href="/toseewritest/operator/questionbank/cqblist?parentQbId=${parentQuestionBankDTO.parentQbId}">子题库</a>
+                                </td>
                             </tr>
                         </#list>
                         </tbody>
@@ -62,20 +66,20 @@
                         <#if currentPage lte 1>
                             <li class="disabled"><a href="#">上页</a></li>
                         <#else>
-                            <li><a href="/tosee_writest/operator/questionbank/list?page=${currentPage - 1}&size=${size}">上页</a></li>
+                            <li><a href="/tosee_writest/operator/questionbank/pqblist?page=${currentPage - 1}&size=${size}">上页</a></li>
                         </#if>
                         <#list 1..parentQuestionBankDTOPage.getTotalPages() as index>
                             <#if currentPage == index>
                                 <li class="disabled"><a href="#">${index}</a></li>
                             <#else>
-                                <li><a href="/tosee_writest/operator/questionbank/list?page=${index}&size=${size}">${index}</a></li>
+                                <li><a href="/tosee_writest/operator/questionbank/pqblist?page=${index}&size=${size}">${index}</a></li>
                             </#if>
                         </#list>
 
                         <#if currentPage gte parentQuestionBankDTOPage.getTotalPages()>
                             <li class="disabled"><a href="#">下页</a></li>
                         <#else>
-                            <li><a href="/tosee_writest/operator/questionbank/list?page=${currentPage + 1}&size=${size}">下页</a></li>
+                            <li><a href="/tosee_writest/operator/questionbank/pqblist?page=${currentPage + 1}&size=${size}">下页</a></li>
                         </#if>
 
                     </ul>

@@ -15,4 +15,8 @@ public interface PracticeRecordService
     void addOrUpdateRecord(PracticeRecordDTO practiceRecordDTO);
 
     PracticeRecordDTO findRecord(String openid, String cqbId);
+
+    List<PracticeRecordDTO> findAllRecordsByOpenid(String openid);
+
+    void deleteRecord(String openid, String recordId);
 }

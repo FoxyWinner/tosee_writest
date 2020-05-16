@@ -46,7 +46,6 @@
                             </select>
                         </div>
 
-<#--                        todo 行测时不用选，默认为0就行-->
                         <div class="form-group">
                             <label>所属行业</label>
                             <select name="fieldType" id="fieldType" class="form-control" onchange="fieldChange()">
@@ -63,7 +62,6 @@
                             </select>
                         </div>
 
-<#--                        todo 岗位只有选择过行业且不为行测题库时显示-->
                         <div class="form-group">
                             <label>所属岗位</label>
                             <select name="positionType" id="positionType" class="form-control">
@@ -74,6 +72,12 @@
                         <div class="form-group">
                             <label>题库名</label>
                             <input name="pqbTitle" type="text" class="form-control" value="${(parentQuestionBank.pqbTitle)!''}"/>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label><input name="isRecommended" type="checkbox" />推荐该主题库</label>
+                            </div>
                         </div>
 
                         <#--                        隐藏的字段 为了传给save-->

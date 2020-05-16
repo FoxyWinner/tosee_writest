@@ -15,5 +15,7 @@ public interface FavoriteRepository extends JpaRepository<Favorite, String>
 {
     boolean existsByOpenidAndFavoriteTypeAndTargetId(String openid, Integer favoriteType, String targetId);
 
+    List<Favorite> findByOpenidAndFavoriteTypeOrderByUpdateTimeAsc(String openid, Integer favoriteType);
+
     void deleteByOpenidAndFavoriteTypeAndTargetId(String openid, Integer favoriteType, String targetId);
 }

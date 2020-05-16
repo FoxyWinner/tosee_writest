@@ -314,7 +314,9 @@ public class WritesterQuestionBankController
             if(mistaken == 1)
             {
                 // 只返错题，未作答的题和回答错误的题才叫错题
-                if(!questionVO.getUserAnswer().equals(questionVO.getAnswer())
+//                if(StringUtils.isEmpty(userAnswerList.get(i)) || ((questionDTOList.get(i).getQuestionType()!=QuestionTypeEnum.ESSAY_QUESTION.getCode())  && !userAnswerList.get(i).equals(questionDTOList.get(i).getAnswer())))
+
+                    if( ( questionVO.getQuestionType()!= QuestionTypeEnum.ESSAY_QUESTION.getCode() && !questionVO.getUserAnswer().equals(questionVO.getAnswer()))
                         || StringUtils.isEmpty(questionVO.getUserAnswer()))
                     result.add(questionVO);
             }
@@ -387,29 +389,32 @@ public class WritesterQuestionBankController
 
         practiceRecordService.addOrUpdateRecord(practiceRecordDTO);
 
-        // 在记录之前，如果是完成的记录，则将【未作答和错题】计入错题本！
-        // 1. 先拿到错题IDs
-        List<String> userAnswerList = recordForm.getUserAnswerList();
-        List<String> wrongQuestionIds = new ArrayList<>();
-        List<Integer> wrongQuestionSeqs = new ArrayList<>();
-
-        List<QuestionDTO> questionDTOList = questionBankService.findQuestionListByCQBId(recordForm.getCqbId());
-        for (int i = 0; i < questionDTOList.size(); i++)
+        //完成作答才记录错题
+        if(recordForm.getComplete() == 1)
         {
-            // 筛选未作答和错题
-            if(StringUtils.isEmpty(userAnswerList.get(i)) || !userAnswerList.get(i).equals(questionDTOList.get(i).getAnswer()))
+            // 在记录之前，如果是完成的记录，则将【未作答和错题】计入错题本！
+            // 1. 先拿到错题IDs
+            List<String> userAnswerList = recordForm.getUserAnswerList();
+            List<String> wrongQuestionIds = new ArrayList<>();
+            List<Integer> wrongQuestionSeqs = new ArrayList<>();
+
+            List<QuestionDTO> questionDTOList = questionBankService.findQuestionListByCQBId(recordForm.getCqbId());
+            for (int i = 0; i < questionDTOList.size(); i++)
             {
-                wrongQuestionIds.add(questionDTOList.get(i).getQuestionId());
-                wrongQuestionSeqs.add(questionDTOList.get(i).getQuestionSeq());
+                // 筛选未作答和错题 (问答题只要非空就算正确)
+                if(StringUtils.isEmpty(userAnswerList.get(i)) || ((questionDTOList.get(i).getQuestionType()!=QuestionTypeEnum.ESSAY_QUESTION.getCode())  && !userAnswerList.get(i).equals(questionDTOList.get(i).getAnswer())))
+                {
+                    wrongQuestionIds.add(questionDTOList.get(i).getQuestionId());
+                    wrongQuestionSeqs.add(questionDTOList.get(i).getQuestionSeq());
+                }
             }
+            log.info("【创建错题本】用户这次做错了{}题",wrongQuestionSeqs);
+
+            // 2. 添加到错题本
+            MistakeBook mistakeBook = mistakeBookService.findMistakeBook(recordForm.getOpenid(),recordForm.getCqbId());
+            if (mistakeBook == null) mistakeBook = mistakeBookService.initAMistakeBook(recordForm.getOpenid(),recordForm.getCqbId());
+            mistakeBookService.addMistake(wrongQuestionIds,mistakeBook);
         }
-        log.info("【创建错题本】用户这次做错了{}题",wrongQuestionSeqs);
-
-        // 2. 添加到错题本
-        MistakeBook mistakeBook = mistakeBookService.findMistakeBook(recordForm.getOpenid(),recordForm.getCqbId());
-        if (mistakeBook == null) mistakeBook = mistakeBookService.initAMistakeBook(recordForm.getOpenid(),recordForm.getCqbId());
-        mistakeBookService.addMistake(wrongQuestionIds,mistakeBook);
-
 
         Map<String, Integer> map = new HashMap<>();
         // todo 现在surpassRatio是空的，我想要上面addOrUpdateRecord返回surpassRatio
@@ -433,12 +438,14 @@ public class WritesterQuestionBankController
 
             if(practiceRecord == null)
             {
+                childQuestionBankVO.setComplete(0);
                 childQuestionBankVO.setSpentTime(0);
                 childQuestionBankVO.setCompleteNumber(0);
                 childQuestionBankVO.setCorrectRatio(-1);// 没有记录的时候就传-1
                 childQuestionBankVO.setLastMode(RecordLastModeEnum.UNKOWN_MODE.getCode()); // 暂时传0
             }else
             {
+                childQuestionBankVO.setComplete(practiceRecord.getComplete());
                 childQuestionBankVO.setSpentTime(practiceRecord.getSpentTime());
                 childQuestionBankVO.setCompleteNumber(practiceRecord.getCompleteNumber());
                 childQuestionBankVO.setCorrectRatio(practiceRecord.getCorrectRatio());

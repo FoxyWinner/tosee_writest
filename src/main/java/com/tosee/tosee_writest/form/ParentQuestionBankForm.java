@@ -27,7 +27,7 @@ public class ParentQuestionBankForm
     private String pqbTitle;
 
     @NotNull(message = "是否推荐必选")
-    private Integer isRecommended;
+    private Boolean isRecommended;
 
     // 发布日期，默认显示当前
 

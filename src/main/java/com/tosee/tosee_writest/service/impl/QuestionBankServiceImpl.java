@@ -83,6 +83,25 @@ public class QuestionBankServiceImpl implements QuestionBankService
     }
 
     @Override
+    public ChildQuestionBank findCQBById(String childQbId)
+    {
+        return childQuestionBankRepository.findById(childQbId).orElse(null);
+    }
+
+
+    /**
+     * 该函数应为按照openid查询给该用户推荐的子题库列表，先暂时传的被编辑点了推荐的子题库
+     * @param openid
+     * @return
+     */
+    @Override
+    public List<ChildQuestionBank> findRecommendedCQB(String openid)
+    {
+        List<ChildQuestionBank> result = childQuestionBankRepository.findByIsRecommendedOrderByCqbHeatDesc(1);
+        return result;
+    }
+
+    @Override
     public List<QuestionDTO> findQuestionListByCQBId(String childQbId)
     {
         List<Question> questions = questionRepository.findQuestionsByChildQbIdOrderByQuestionSeqAsc(childQbId);
@@ -161,6 +180,14 @@ public class QuestionBankServiceImpl implements QuestionBankService
     }
 
     @Override
+    public Integer getSimulationTime(String childQbId)
+    {
+        ChildQuestionBank childQuestionBank = childQuestionBankRepository.findById(childQbId).orElse(null);
+        if(childQuestionBank != null) return childQuestionBank.getSimulationTime();
+        else return 0;
+    }
+
+    @Override
     public String getCQbTitle(String childQbId)
     {
         ChildQuestionBank childQuestionBank = childQuestionBankRepository.findById(childQbId).orElse(null);
@@ -228,6 +255,62 @@ public class QuestionBankServiceImpl implements QuestionBankService
     }
 
     @Override
+    public Page<ChildQuestionBank> findCQBList(Pageable pageable)
+    {
+        Page<ChildQuestionBank> childQuestionBankPage =  childQuestionBankRepository.findAll(pageable);
+
+        return childQuestionBankPage;
+    }
+
+    @Override
+    public Page<ChildQuestionBank> findCQBList(Pageable pageable, String pqbId)
+    {
+        Page<ChildQuestionBank> childQuestionBankPage =  childQuestionBankRepository.findByParentQbIdOrderByRelaseTime(pageable,pqbId);
+
+        return childQuestionBankPage;
+    }
+
+    @Override
+    public List<ChildQuestionBank> findAllCQBs()
+    {
+        return childQuestionBankRepository.findAll();
+    }
+
+    @Override
+    public Page<QuestionDTO> findQuestionsDTOList(Pageable pageable)
+    {
+        List<Question> questions = questionRepository.findAll();
+
+        // 这里把questions转为questionDTOS
+        List<QuestionDTO> questionDTOS = Question2QuestionDTOConverter.convert(questions);
+
+        //为DTOList里每个QuestionDTO填充他的选项List
+        for (QuestionDTO questionDTO : questionDTOS)
+        {
+            if(questionDTO.getQuestionType()!= QuestionTypeEnum.ESSAY_QUESTION.getCode())
+            {
+                List<QuestionOption> questionOptions = questionOptionRepository.findByQuestionIdOrderByOptionNameAsc(questionDTO.getQuestionId());
+
+                if(CollectionUtils.isEmpty(questionOptions))
+                {
+                    throw new WritestException(ResultEnum.OPTIONS_NOT_EXIST);
+                }
+
+                questionDTO.setQuestionOptions(questionOptions);
+            }
+        }
+
+        return new PageImpl<>(questionDTOS, pageable,questionDTOS.size());
+    }
+
+    @Override
+    public Page<QuestionDTO> findQuestionsDTOList(Pageable pageable, String cqbId)
+    {
+        List<QuestionDTO> questionDTOS = this.findQuestionListByCQBId(cqbId);
+        return new PageImpl<>(questionDTOS, pageable,questionDTOS.size());
+    }
+
+    @Override
     public ParentQuestionBankDTO findOneParentQuestionBankDTO(String pqbId)
     {
         ParentQuestionBank parentQuestionBank = parentQuestionBankRepository.findById(pqbId).orElse(null);
@@ -277,5 +360,32 @@ public class QuestionBankServiceImpl implements QuestionBankService
     public ChildQuestionBank findById(String childQbId)
     {
         return childQuestionBankRepository.findById(childQbId).orElse(null);
+    }
+
+    @Override
+    public List<ParentQuestionBankDTO> findAllPQB()
+    {
+        List<ParentQuestionBank> parentQuestionBankList =parentQuestionBankRepository.findAll();
+        List<ParentQuestionBankDTO> result = new ArrayList<>();
+
+        for (ParentQuestionBank parentQuestionBank : parentQuestionBankList)
+        {
+            ParentQuestionBankDTO parentQuestionBankDTO = ParentQB2ParentQBDTOConverter.convert(parentQuestionBank);
+
+            // converter中无法调用service或repository，需要在这填入实体公司 行业 职位
+            if(parentQuestionBank.getCompanyId() != null)
+            {
+                Company company = companyRepository.findById(parentQuestionBank.getCompanyId()).orElse(null);
+                parentQuestionBankDTO.setCompany(company);
+
+            }
+
+            parentQuestionBankDTO.setWorkField(workFieldRepository.findByFieldType(parentQuestionBank.getFieldType()));
+            parentQuestionBankDTO.setWorkPosition(workPositionRepository.findByPositionType(parentQuestionBank.getPositionType()));
+
+            result.add(parentQuestionBankDTO);
+        }
+
+        return result;
     }
 }

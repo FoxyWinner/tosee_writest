@@ -24,6 +24,7 @@ public class ChildQuestionBankVO
 
     private Integer simulationTime;
 
+    private Integer complete;
     //完成（单位个）
     private Integer completeNumber;
 

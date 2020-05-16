@@ -3,12 +3,16 @@ package com.tosee.tosee_writest.service.impl;
 import com.tosee.tosee_writest.converter.PracticeRecord2PracticeRecordDTOConverter;
 import com.tosee.tosee_writest.dataobject.PracticeRecord;
 import com.tosee.tosee_writest.dto.PracticeRecordDTO;
+import com.tosee.tosee_writest.enums.ResultEnum;
+import com.tosee.tosee_writest.exception.WritestException;
 import com.tosee.tosee_writest.repository.PracticeRecordRepository;
 import com.tosee.tosee_writest.service.PracticeRecordService;
 import com.tosee.tosee_writest.utils.KeyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sun.dc.pr.PRError;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -69,5 +73,29 @@ public class PracticeRecordServiceImpl implements PracticeRecordService
         PracticeRecord practiceRecord = practiceRecordRepository.findByOpenIdAndAndChildQbId(openid,cqbId);
         PracticeRecordDTO recordDTO = PracticeRecord2PracticeRecordDTOConverter.convert(practiceRecord);
         return recordDTO;
+    }
+
+    @Override
+    public List<PracticeRecordDTO> findAllRecordsByOpenid(String openid)
+    {
+        List<PracticeRecordDTO> result = new ArrayList<>();
+        List<PracticeRecord> practiceRecords = practiceRecordRepository.findByOpenId(openid);
+        for (PracticeRecord practiceRecord : practiceRecords)
+        {
+            PracticeRecordDTO recordDTO = PracticeRecord2PracticeRecordDTOConverter.convert(practiceRecord);
+            result.add(recordDTO);
+        }
+        return result;
+    }
+
+    @Override
+    public void deleteRecord(String openid, String recordId)
+    {
+        PracticeRecord practiceRecord = practiceRecordRepository.findById(recordId).orElse(null);
+        if(practiceRecord.getOpenId().equals(openid))
+        {
+            practiceRecordRepository.deleteById(recordId);
+        }
+        else throw new WritestException(ResultEnum.EXCEED_AUTHORITY);
     }
 }

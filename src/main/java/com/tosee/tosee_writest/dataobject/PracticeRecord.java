@@ -5,6 +5,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.util.Date;
 
 /**
  * @Author: FoxyWinner
@@ -37,4 +38,8 @@ public class PracticeRecord
     private Integer correctRatio;
 
     private Integer surpassRatio;
+
+    private Date createTime;
+
+    private Date updateTime;
 }

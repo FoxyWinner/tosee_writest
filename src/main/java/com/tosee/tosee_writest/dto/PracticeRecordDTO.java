@@ -2,6 +2,7 @@ package com.tosee.tosee_writest.dto;
 
 import lombok.Data;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -34,4 +35,8 @@ public class PracticeRecordDTO
     private Integer correctRatio;
 
     private Integer surpassRatio;
+
+    private Date createTime;
+
+    private Date updateTime;
 }

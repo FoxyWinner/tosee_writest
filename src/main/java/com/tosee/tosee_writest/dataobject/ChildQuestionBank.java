@@ -29,6 +29,8 @@ public class ChildQuestionBank
 
     private Integer simulationTime;
 
+    private Integer isRecommended;
+
     private String relaseTime;
 
     public ChildQuestionBank()

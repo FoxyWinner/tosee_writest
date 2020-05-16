@@ -9,22 +9,21 @@ import java.util.Date;
 
 /**
  * @Author: FoxyWinner
- * @Date: 2020/5/4 4:57 下午
+ * @Date: 2020/5/15 11:31 上午
  */
-
 @Entity
 @DynamicUpdate
 @Data
-public class Favorite
+public class CollectBook
 {
     @Id
-    private String favoriteId;
+    private String collectBookId;
 
     private String openid;
 
-    private Integer favoriteType;
+    private String cqbId;
 
-    private String targetId;
+    private Integer collectNumber;
 
     private Date createTime;
 

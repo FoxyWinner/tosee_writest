@@ -320,7 +320,7 @@ create table `experience_article`(
 
 ## 六、复习篇
 
-### 错题本
+### 错题本✅
 
 该表应该看做一个含有用户信息的虚拟子题库
 
@@ -345,7 +345,7 @@ create table `mistake_book`(
 );
 ```
 
-### 错题
+### 错题✅
 
 ```mysql
 create table `mistake`(
@@ -393,7 +393,53 @@ create table `favorite`(
 );
 ```
 
+### 收藏题目册✅
 
+该表应该看做一个含有用户信息的虚拟子题库
+
+```mysql
+create table `collect_book`(
+  /* ID */
+  `collect_book_id` varchar(32) not null,
+  
+  /* 题目信息 */
+  `openid` varchar(32) not null,
+  
+  `cqb_id` varchar(32) not null comment '对应的真正子题库',
+  
+  `collect_number` int not null comment '错题数量',
+  
+  
+  /* 时间戳 */
+  `create_time` timestamp not null default current_timestamp comment '创建时间',
+  `update_time`  timestamp not null default current_timestamp on update current_timestamp comment '修改时间',
+  
+	primary key (`collect_book_id`)
+);
+```
+
+### 收藏题✅
+
+```mysql
+create table `collect_question`(
+  /* ID */
+  `collect_question_id` varchar(32) not null,
+  
+  /* 收藏题信息 */
+  `openid` varchar(32) not null,
+  
+  `collect_book_id` varchar(32) not null comment '所属的收藏题目册id',
+  
+  `question_id` varchar(32) not null comment '指向的真正题目',
+  
+  
+  /* 时间戳 */
+  `create_time` timestamp not null default current_timestamp comment '创建时间',
+  `update_time`  timestamp not null default current_timestamp on update current_timestamp comment '修改时间',
+  
+	primary key (`collect_question_id`)
+);
+```
 
 ### 练习记录✅
 

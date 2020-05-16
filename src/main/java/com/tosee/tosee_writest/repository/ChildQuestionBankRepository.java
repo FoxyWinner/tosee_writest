@@ -1,6 +1,8 @@
 package com.tosee.tosee_writest.repository;
 
 import com.tosee.tosee_writest.dataobject.ChildQuestionBank;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -14,4 +16,8 @@ public interface ChildQuestionBankRepository extends JpaRepository<ChildQuestion
     List<ChildQuestionBank> findByParentQbIdOrderByCqbHeatDesc(String parentQbId);
 
     List<ChildQuestionBank> findByParentQbIdOrderByRelaseTimeDesc(String parentQbId);
+
+    List<ChildQuestionBank> findByIsRecommendedOrderByCqbHeatDesc(Integer isRecommended);
+
+    Page<ChildQuestionBank> findByParentQbIdOrderByRelaseTime(Pageable pageable , String parentQbId);
 }
