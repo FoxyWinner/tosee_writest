@@ -1,9 +1,7 @@
 package com.tosee.tosee_writest.repository;
 
 import com.tosee.tosee_writest.dataobject.Favorite;
-import com.tosee.tosee_writest.dataobject.Question;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -15,7 +13,7 @@ public interface FavoriteRepository extends JpaRepository<Favorite, String>
 {
     boolean existsByOpenidAndFavoriteTypeAndTargetId(String openid, Integer favoriteType, String targetId);
 
-    List<Favorite> findByOpenidAndFavoriteTypeOrderByUpdateTimeAsc(String openid, Integer favoriteType);
+    List<Favorite> findByOpenidAndFavoriteTypeOrderByUpdateTimeDesc(String openid, Integer favoriteType);
 
     void deleteByOpenidAndFavoriteTypeAndTargetId(String openid, Integer favoriteType, String targetId);
 }

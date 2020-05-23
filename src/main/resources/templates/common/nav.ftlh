@@ -29,6 +29,7 @@
                 <li class="dropdown-header">操作</li>
                 <li><a href="/toseewritest/operator/questionbank/questionlist">列表</a></li>
                 <li><a href=/toseewritest/operator/questionbank/questionindex>新增</a></li>
+<#--                <li><a href=/toseewritest/operator/questionbank/questionindextest>新增(测试用)</a></li>-->
             </ul>
         </li>
 

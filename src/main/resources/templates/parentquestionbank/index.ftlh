@@ -16,10 +16,9 @@
                     <form role="form" method="post" action="/toseewritest/operator/questionbank/pqbsave">
                         <div class="form-group">
                             <label>题库类型</label>
-                            <select name="pqbType" class="form-control">
+                            <select name="pqbType" class="form-control" id="pqbType" onchange="pQBtypeChange()">
+                                <option>请选择题库类型</option>
                                 <#list typeEnumList as typeEnum>
-                                <#--                                    两个问号是"如果存在"的意思-->
-                                    <option>请选择题库类型</option>
                                     <option value="${typeEnum.code}"
                                             <#if (parentQuestionBank.pqbType)?? && parentQuestionBank.pqbType == typeEnum.code>
                                                 selected
@@ -30,12 +29,11 @@
                             </select>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" id="companyId-div">
                             <label>所属公司</label>
-                            <select name="companyId" class="form-control">
+                            <select name="companyId" id="companyId" class="form-control">
+                                <option value="">请选择公司</option>
                                 <#list companyList as company>
-                                    <option>请选择公司</option>
-                                <#--                                    两个问号是"如果存在"的意思-->
                                     <option value="${company.companyId}"
                                             <#if (parentQuestionBank.companyId)?? && parentQuestionBank.companyId == company.companyId>
                                                 selected
@@ -46,7 +44,7 @@
                             </select>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" id="fieldType-div">
                             <label>所属行业</label>
                             <select name="fieldType" id="fieldType" class="form-control" onchange="fieldChange()">
                                 <option>请选择岗位</option>
@@ -62,7 +60,7 @@
                             </select>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" id="positionType-div">
                             <label>所属岗位</label>
                             <select name="positionType" id="positionType" class="form-control">
                                 <option>请选择岗位</option>
@@ -74,9 +72,24 @@
                             <input name="pqbTitle" type="text" class="form-control" value="${(parentQuestionBank.pqbTitle)!''}"/>
                         </div>
 
+                        <div class="form-group" >
+                            <label>发布时间</label>
+                            <#--                            这个要给人呈现个默认的-->
+                            <input name="relaseTime" type="text" class="form-control" value="${(parentQuestionBank.relaseTime)!.now?string("yyyy/MM/dd")}"/>
+                        </div>
+
+                        <div class="form-group">
+                            <label>热度</label>
+                            <input name="pqbHeat" type="text" class="form-control" value="${(parentQuestionBank.pqbHeat)!''}"/>
+                        </div>
+
                         <div class="form-group">
                             <div class="checkbox">
-                                <label><input name="isRecommended" type="checkbox" />推荐该主题库</label>
+                                <label><input name="isRecommended" type="checkbox"
+                                            <#if parentQuestionBank?? && parentQuestionBank.isRecommended == 1>
+                                                checked="checked"
+                                            </#if>
+                                    />推荐该主题库</label>
                             </div>
                         </div>
 
@@ -94,11 +107,12 @@
 </html>
 
 <script type="text/javascript">
-    var currentfieldType = $("#fieldType").val();
+
     // 在进入首页渲染完毕时先调用一次fieldChange（）
     if (currentfieldType != null) fieldChange();
     function fieldChange()
     {
+        var currentfieldType = $("#fieldType").val();
         var fieldType = $("#fieldType").val();
         var html = "";
         <#list workPositionList as workPosition>
@@ -114,5 +128,30 @@
 
         $("#positionType").empty();
         $(html).appendTo("#positionType");
+    }
+
+    function pQBtypeChange()
+    {
+        var currentType = $("#pqbType").val();
+        if (currentType != 0)
+        {
+            $("#companyId-div").hide();
+        }
+        else $("#companyId-div").show();
+
+        // 行测
+        if (currentType == 2)
+        {
+            $("#fieldType-div").hide();
+            $("#positionType-div").hide();
+            $("#positionType option:selected").val(0);
+            $("#fieldType option:selected").val(0);
+        }else
+        {
+            $("#fieldType-div-div").show();
+            $("#positionType-div").show();
+            $("#positionType").reset();
+            $("#fieldType").reset();
+        }
     }
 </script>

@@ -1,8 +1,6 @@
 package com.tosee.tosee_writest.service;
 
-import com.tosee.tosee_writest.dataobject.ChildQuestionBank;
-import com.tosee.tosee_writest.dataobject.ParentQuestionBank;
-import com.tosee.tosee_writest.dataobject.PracticeRecord;
+import com.tosee.tosee_writest.dataobject.*;
 import com.tosee.tosee_writest.dto.ParentQuestionBankDTO;
 import com.tosee.tosee_writest.dto.QuestionDTO;
 import com.tosee.tosee_writest.enums.QuestionBankSortEnum;
@@ -18,12 +16,21 @@ import java.util.List;
 
 public interface QuestionBankService
 {
-    /** 查询企业真题主题库列表
+    /** 查询主题库列表
      * @param positionType
-     * @param pqbType
+     * @param pqbType 题库类型
      * @param sortRule*/
     List<ParentQuestionBank> findPQBListByPositionTypeAndPqbTypeOrderBy(Integer positionType, Integer pqbType, QuestionBankSortEnum sortRule);
 
+    /**
+     * 查询企业真题主题库列表（positionTypes为多个）
+     * @param positionTypes
+     * @param sortRule
+     * @return
+     */
+    List<ParentQuestionBank> findEPQBListByPositionTypesAndPqbTypeOrderBy(List<Integer> positionTypes, QuestionBankSortEnum sortRule);
+
+    List<ParentQuestionBank> findEPQBListRecommendedOrderBy(QuestionBankSortEnum sortRule);
 
     /** 查询行测题库列表
      *
@@ -58,7 +65,9 @@ public interface QuestionBankService
      String getCQbTitle(String childQbId);
 
      /** 为某套子题库热度++，顺便重新计算父题库热度*/
-    public void increaseChildQuestionBankHeat(String childQbId);
+     void increaseChildQuestionBankHeat(String childQbId);
+
+    void updateParentQuestionBankHeat(String parentQbId);
 
 
     // 以下为运营用
@@ -87,6 +96,21 @@ public interface QuestionBankService
 
     ChildQuestionBank findById(String childQbId);
 
-    List<ParentQuestionBankDTO> findAllPQB();
+    List<ParentQuestionBankDTO> findAllPQBDTOs();
+
+    List<ParentQuestionBank> findAllPQBs();
+
+    /**
+     * QuestionOption相关
+     */
+
+    // 运营管理-新建/更改题目
+    Question saveQuestionDTO(QuestionDTO questionDTO);
+
+    ChildQuestionBank saveChildQuestionBank(ChildQuestionBank childQuestionBank);
+
+    String deleteQuestionById(String questionId);
+
+
 
 }

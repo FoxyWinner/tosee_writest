@@ -18,6 +18,16 @@ public interface ParentQuestionBankRepository extends JpaRepository<ParentQuesti
     // 时间最新排列
     List<ParentQuestionBank> findByPositionTypeAndPqbTypeOrderByRelaseTimeDesc(Integer positionType, Integer pqbType);
 
+    // 按多个岗位查询主题库列表(热度排序)
+    List<ParentQuestionBank> findByPositionTypeInAndPqbTypeOrderByPqbHeatDesc(List<Integer> positionTypes,Integer pqbType);
+
+    // 按多个岗位查询主题库列表(时间排序)
+    List<ParentQuestionBank> findByPositionTypeInAndPqbTypeOrderByRelaseTimeDesc(List<Integer> positionTypes,Integer pqbType);
+
+    List<ParentQuestionBank> findByIsRecommendedAndPqbTypeOrderByPqbHeatDesc(Integer isRecommended,Integer pqbType);
+
+    List<ParentQuestionBank> findByIsRecommendedAndPqbTypeOrderByRelaseTimeDesc(Integer isRecommended,Integer pqbType);
+
     // 查询行测父题库列表
     List<ParentQuestionBank> findByPqbTypeOrderByPqbHeat(Integer pqbType);
 

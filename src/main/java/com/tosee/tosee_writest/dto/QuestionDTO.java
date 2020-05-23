@@ -26,6 +26,8 @@ public class QuestionDTO
 
     private String childQbId;
 
+    private String childQbTitle;
+
     private Integer questionType;
 
     private Integer questionSeq;
@@ -47,21 +49,22 @@ public class QuestionDTO
     @JsonIgnore
     public String getOptionsJson()
     {
-        List<QuestionOptionVO> questionOptionVOList = new ArrayList<>();
-        // 为空的话肯定是问答题啦，不为空才填选项
-        if(questionOptions != null)
-        {
-            for (QuestionOption questionOption : questionOptions)
-            {
-                QuestionOptionVO questionOptionVO = new QuestionOptionVO();
-                BeanUtils.copyProperties(questionOption,questionOptionVO);
-                questionOptionVOList.add(questionOptionVO);
-            }
-        }
+//        List<QuestionOptionVO> questionOptionVOList = new ArrayList<>();
+//        // 为空的话肯定是问答题啦，不为空才填选项
+//        if(questionOptions != null)
+//        {
+//            for (QuestionOption questionOption : questionOptions)
+//            {
+//                QuestionOptionVO questionOptionVO = new QuestionOptionVO();
+//                BeanUtils.copyProperties(questionOption,questionOptionVO);
+//                questionOptionVOList.add(questionOptionVO);
+//            }
+//        }
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setPrettyPrinting();
         Gson gson = gsonBuilder.create();
-        return gson.toJson(questionOptionVOList);
+        // 还是得把ID传过去，不然存的时候没法存了，要用json控制TEXTAREA
+        return gson.toJson(questionOptions);
     }
 }

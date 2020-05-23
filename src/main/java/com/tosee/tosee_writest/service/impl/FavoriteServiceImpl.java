@@ -65,7 +65,7 @@ public class FavoriteServiceImpl implements FavoriteService
     @Override
     public List<Favorite> findByOpenidAndFavoriteType(String openid, Integer favoriteType)
     {
-        return favoriteRepository.findByOpenidAndFavoriteTypeOrderByUpdateTimeAsc(openid, favoriteType);
+        return favoriteRepository.findByOpenidAndFavoriteTypeOrderByUpdateTimeDesc(openid, favoriteType);
     }
 
     @Override
@@ -79,7 +79,6 @@ public class FavoriteServiceImpl implements FavoriteService
         else// 若为题目的话，这里的targetId其实是questionId
         {
             this.cancelCollect(openid,targetId);
-
         }
     }
 

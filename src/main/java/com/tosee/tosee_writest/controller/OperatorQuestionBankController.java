@@ -1,17 +1,24 @@
 package com.tosee.tosee_writest.controller;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.tosee.tosee_writest.dataobject.*;
 import com.tosee.tosee_writest.dto.ParentQuestionBankDTO;
 import com.tosee.tosee_writest.dto.QuestionDTO;
 import com.tosee.tosee_writest.enums.ParentQuestionBankTypeEnum;
 import com.tosee.tosee_writest.enums.QuestionTypeEnum;
+import com.tosee.tosee_writest.enums.ResultEnum;
 import com.tosee.tosee_writest.exception.WritestException;
+import com.tosee.tosee_writest.form.ChildQuestionBankForm;
 import com.tosee.tosee_writest.form.ParentQuestionBankForm;
 import com.tosee.tosee_writest.form.QuestionForm;
 import com.tosee.tosee_writest.service.CompanyService;
 import com.tosee.tosee_writest.service.PositionService;
 import com.tosee.tosee_writest.service.QuestionBankService;
 import com.tosee.tosee_writest.utils.KeyUtil;
+import com.tosee.tosee_writest.utils.ResultVOUtil;
+import com.tosee.tosee_writest.vo.ResultVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,7 +112,8 @@ public class OperatorQuestionBankController
     @PostMapping("/pqbsave")
     public ModelAndView pqbSave(@Valid ParentQuestionBankForm form,
                              BindingResult bindingResult,
-                             Map<String, Object> map) {
+                             Map<String, Object> map)
+    {
         if (bindingResult.hasErrors()) {
             map.put("msg", bindingResult.getFieldError().getDefaultMessage());
             map.put("url", "/toseewritest/operator/questionbank/pqbindex");
@@ -121,6 +129,7 @@ public class OperatorQuestionBankController
                 parentQuestionBank = questionBankService.findOneParentQuestionBank(form.getParentQbId());
             } else
             {
+                parentQuestionBank.setCqbNumber(0);
                 form.setParentQbId(KeyUtil.genUniqueKey());
             }
             BeanUtils.copyProperties(form, parentQuestionBank);
@@ -165,6 +174,70 @@ public class OperatorQuestionBankController
     }
 
 
+    @GetMapping("/cqbindex")
+    public ModelAndView cqbindex(@RequestParam(value = "childQbId", required = false) String childQbId,
+                                Map<String, Object> map) {
+        if (!StringUtils.isEmpty(childQbId)) {
+            ChildQuestionBank childQuestionBank = questionBankService.findCQBById(childQbId);
+            map.put("childQuestionBank", childQuestionBank);
+        }
+
+        //查询父题库列表
+        List<ParentQuestionBank> parentQuestionBankList = questionBankService.findAllPQBs();
+
+        /** 供下拉列表读取的各项参数. */
+        map.put("parentQuestionBankList", parentQuestionBankList);
+        return new ModelAndView("childquestionbank/index", map);
+    }
+
+    @PostMapping("/cqbsave")
+    public ModelAndView cqbsave(@Valid ChildQuestionBankForm form,
+                                BindingResult bindingResult,
+                                Map<String, Object> map)
+    {
+        if (bindingResult.hasErrors()) {
+            map.put("msg", bindingResult.getFieldError().getDefaultMessage());
+            map.put("url", "/toseewritest/operator/questionbank/cqbindex");
+            return new ModelAndView("common/error", map);
+        }
+
+        ChildQuestionBank childQuestionBank  = new ChildQuestionBank();
+        try
+        {
+            //如果parentQbId为空, 说明是新增
+            if (!StringUtils.isEmpty(form.getChildQbId()))
+            {
+                childQuestionBank = questionBankService.findCQBById(form.getChildQbId());
+            } else
+            {
+                form.setChildQbId(KeyUtil.genUniqueKey());
+                childQuestionBank.setQuestionNumber(0);
+            }
+            BeanUtils.copyProperties(form, childQuestionBank);
+
+            if(form.getIsRecommended())
+            {
+                log.info("【子题库被推荐】");
+                childQuestionBank.setIsRecommended(1);
+            }
+            else childQuestionBank.setIsRecommended(0);
+
+
+            log.info("【子题库保存】{}",childQuestionBank);
+            questionBankService.saveChildQuestionBank(childQuestionBank);
+
+            questionBankService.updateParentQuestionBankHeat(childQuestionBank.getParentQbId());
+        } catch (WritestException e)
+        {
+            map.put("msg", e.getMessage());
+            map.put("url", "/toseewritest/operator/questionbank/cqbindex");
+            return new ModelAndView("common/error", map);
+        }
+
+        map.put("url", "/toseewritest/operator/questionbank/cqblist");
+        return new ModelAndView("common/success", map);
+    }
+
     @GetMapping("questionlist")
     public ModelAndView questionlist(@RequestParam (value = "childQbId" , required = false) String childQbId,
                                 @RequestParam(value = "page", defaultValue = "1") Integer page,
@@ -190,13 +263,17 @@ public class OperatorQuestionBankController
 
     @GetMapping("questionindex")
     public ModelAndView questionIndex(@RequestParam(value = "questionId", required = false) String questionId,
-                              Map<String, Object> map) {
-
+                                      @RequestParam(value = "lastChildQbId", required = false) String lastChildQbId,
+                                      Map<String, Object> map)
+    {
         if (!StringUtils.isEmpty(questionId)) {
             QuestionDTO questionDTO = questionBankService.findQuestionById(questionId);
             map.put("questionDTO", questionDTO);
         }
 
+        if (!StringUtils.isEmpty(lastChildQbId)) {
+            map.put("lastChildQbId", lastChildQbId);
+        }
 
         // 题型选择列表
         List<QuestionTypeEnum> typeEnumList = new ArrayList<>();
@@ -211,15 +288,39 @@ public class OperatorQuestionBankController
         map.put("typeEnumList", typeEnumList);
         map.put("childQuestionBankList", childQuestionBankList);
 
-
-
         return new ModelAndView("question/index", map);
+    }
+
+    @GetMapping("questionindextest")
+    public ModelAndView questionIndexTest(@RequestParam(value = "questionId", required = false) String questionId,
+                                      Map<String, Object> map)
+    {
+        if (!StringUtils.isEmpty(questionId)) {
+            QuestionDTO questionDTO = questionBankService.findQuestionById(questionId);
+            map.put("questionDTO", questionDTO);
+        }
+
+        // 题型选择列表
+        List<QuestionTypeEnum> typeEnumList = new ArrayList<>();
+        typeEnumList.add(QuestionTypeEnum.SINGLE_CHOICE);
+        typeEnumList.add(QuestionTypeEnum.MULTIPLE_CHOICE);
+        typeEnumList.add(QuestionTypeEnum.ESSAY_QUESTION);
+
+        // 子题库选择列表
+        List<ChildQuestionBank> childQuestionBankList = questionBankService.findAllCQBs();
+
+        /** 供下拉列表读取的各项参数. */
+        map.put("typeEnumList", typeEnumList);
+        map.put("childQuestionBankList", childQuestionBankList);
+
+        return new ModelAndView("question/indextest", map);
     }
 
     @PostMapping("questionsave")
     public ModelAndView questionsave(@Valid QuestionForm form,
                                 BindingResult bindingResult,
-                                Map<String, Object> map) {
+                                Map<String, Object> map)
+    {
         if (bindingResult.hasErrors()) {
             map.put("msg", bindingResult.getFieldError().getDefaultMessage());
             map.put("url", "/toseewritest/operator/questionbank/questionindex");
@@ -229,24 +330,42 @@ public class OperatorQuestionBankController
         QuestionDTO questionDTO = new QuestionDTO();
         try
         {
-            //如果暗传的questionId为空, 说明是新增
             if (!StringUtils.isEmpty(form.getQuestionId()))
             {
+                // 是更改题目
                 questionDTO = questionBankService.findQuestionById(form.getQuestionId());
             } else
             {
+                // 是新增题目
                 form.setQuestionId(KeyUtil.genUniqueKey());
+                // 题号
+                Integer questionSeq = questionBankService.getQuestionNumber(form.getChildQbId()) + 1;
+                questionDTO.setQuestionSeq(questionSeq);
             }
 
             BeanUtils.copyProperties(form, questionDTO);
 
-            log.info("【题目保存】选项列表:{}",form.getQuestionOptions());
 
+            // 将form中的questionOptions字符串转为对象List，并存入questionDTO中。
+            GsonBuilder gsonBuilder = new GsonBuilder();
+            gsonBuilder.setPrettyPrinting();
+            Gson gson = gsonBuilder.create();
+            List<QuestionOption> questionOptionList = gson.fromJson(form.getQuestionOptions(),  new TypeToken<List<QuestionOption>>(){}.getType());
 
+            for (QuestionOption questionOption : questionOptionList)
+            {
+                if (questionOption.getOptionId() == null || questionOption.getOptionId().isEmpty())
+                    questionOption.setOptionId(KeyUtil.genUniqueKey());
+                if (questionOption.getQuestionId() == null || questionOption.getQuestionId().isEmpty())
+                    questionOption.setQuestionId(questionDTO.getQuestionId());
+            }
+
+            questionDTO.setQuestionOptions(questionOptionList);
             log.info("【题目保存】{}",questionDTO);
 
-            // todo 保存题目
-//            questionBankService.saveQuestion(questionDTO);
+
+            // 这个save方法中，包含了对子题库题目数的维护
+            questionBankService.saveQuestionDTO(questionDTO);
         } catch (WritestException e)
         {
             map.put("msg", e.getMessage());
@@ -254,8 +373,86 @@ public class OperatorQuestionBankController
             return new ModelAndView("common/error", map);
         }
 
-        map.put("url", "/toseewritest/operator/questionbank/questionlist");
+        map.put("msg", "将继续为该子题库添加题目");
+        map.put("url", "/toseewritest/operator/questionbank/questionindex?lastChildQbId="+questionDTO.getChildQbId());
         return new ModelAndView("common/success", map);
     }
 
+
+    @PostMapping("questionsaveajax")
+    public ResultVO questionSaveAjax(@Valid QuestionForm form,
+                                     BindingResult bindingResult)
+    {
+        if (bindingResult.hasErrors()) {
+            return ResultVOUtil.error(ResultEnum.PARAM_ERROR.getCode(),ResultEnum.PARAM_ERROR.getMessage());
+        }
+
+        QuestionDTO questionDTO = new QuestionDTO();
+        try
+        {
+            if (!StringUtils.isEmpty(form.getQuestionId()))
+            {
+                // 是更改题目
+                questionDTO = questionBankService.findQuestionById(form.getQuestionId());
+            } else
+            {
+                // 是新增题目
+                form.setQuestionId(KeyUtil.genUniqueKey());
+                // 题号
+                Integer questionSeq = questionBankService.getQuestionNumber(form.getChildQbId()) + 1;
+                questionDTO.setQuestionSeq(questionSeq);
+            }
+
+            BeanUtils.copyProperties(form, questionDTO);
+
+
+            // 将form中的questionOptions字符串转为对象List，并存入questionDTO中。
+            GsonBuilder gsonBuilder = new GsonBuilder();
+            gsonBuilder.setPrettyPrinting();
+            Gson gson = gsonBuilder.create();
+            List<QuestionOption> questionOptionList = gson.fromJson(form.getQuestionOptions(),  new TypeToken<List<QuestionOption>>(){}.getType());
+
+            for (QuestionOption questionOption : questionOptionList)
+            {
+                if (questionOption.getOptionId() == null || questionOption.getOptionId().isEmpty())
+                    questionOption.setOptionId(KeyUtil.genUniqueKey());
+                if (questionOption.getQuestionId() == null || questionOption.getQuestionId().isEmpty())
+                    questionOption.setQuestionId(questionDTO.getQuestionId());
+            }
+
+            questionDTO.setQuestionOptions(questionOptionList);
+            log.info("【题目保存】{}",questionDTO);
+
+
+            // 这个save方法中，包含了对子题库题目数的维护
+            questionBankService.saveQuestionDTO(questionDTO);
+        } catch (WritestException e)
+        {
+            return ResultVOUtil.error(ResultEnum.PARAM_ERROR.getCode(),e.getMessage());
+        }
+
+        return ResultVOUtil.success("保存成功");
+    }
+
+
+    @GetMapping("questiondelete")
+    public ModelAndView questionDelete(@RequestParam("questionId") String questionId,
+                                          Map<String, Object> map)
+    {
+        if (StringUtils.isEmpty(questionId)) {
+            map.put("msg", ResultEnum.PARAM_ERROR.getMessage());
+            map.put("url", "/toseewritest/operator/questionbank/questionlist");
+            return new ModelAndView("common/error", map);
+        }
+
+
+        // 删除该题目，内部包含了对子题库题目数的处理
+        String childQbId = questionBankService.deleteQuestionById(questionId);
+
+
+
+        map.put("msg", "将返回该子题库列表");
+        map.put("url", "/toseewritest/operator/questionbank/questionlist?childQbId="+childQbId);
+        return new ModelAndView("common/success", map);
+    }
 }

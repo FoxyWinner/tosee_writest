@@ -1,14 +1,9 @@
 package com.tosee.tosee_writest.converter;
 import com.tosee.tosee_writest.dataobject.PracticeRecord;
 import com.tosee.tosee_writest.dto.PracticeRecordDTO;
-import com.tosee.tosee_writest.form.RecordForm;
-import com.tosee.tosee_writest.utils.StringConvertUtil;
+import com.tosee.tosee_writest.utils.String2ListConvertUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.util.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 public class PracticeRecord2PracticeRecordDTOConverter
@@ -20,7 +15,7 @@ public class PracticeRecord2PracticeRecordDTOConverter
         BeanUtils.copyProperties(practiceRecord,recordDTO);
 
         // 字符串转数组：
-        recordDTO.setUserAnswerList(StringConvertUtil.StringAnswer2ListAnswer(practiceRecord.getUserAnswerList()));
+        recordDTO.setUserAnswerList(String2ListConvertUtil.StringAnswer2ListAnswer(practiceRecord.getUserAnswerList()));
 
 
         return recordDTO;

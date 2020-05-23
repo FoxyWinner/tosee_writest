@@ -89,7 +89,7 @@ public class MistakeBookServiceImpl implements MistakeBookService
     @Override
     public MistakeBook findMistakeBook(String openid, String cqbid)
     {
-        return mistakeBookRepository.findByOpenidAndAndCqbId(openid,cqbid);
+        return mistakeBookRepository.findByOpenidAndCqbId(openid,cqbid);
     }
 
     // 这个DTO里实际上没有那个List<Mistake>的 以后用到再加吧
@@ -134,6 +134,8 @@ public class MistakeBookServiceImpl implements MistakeBookService
         }
 
         mistakeRepository.delete(mistake);
+
+        // 还要对错题列表重新排序吗？不需要，每次请求列表的时候序号都是动态填入的
 
         // 查看对应的错题本，错题数为0则直接删除，否则就更新
         MistakeBook mistakeBook = mistakeBookRepository.findById(mistake.getMistakeBookId()).orElse(null);

@@ -29,7 +29,6 @@ public class QuestionForm
     @NotEmpty(message = "解析必填")
     private String explanation;
 
-    // 用JSON传？
-    @NotEmpty(message = "选项必填")
+    // todo 我要想办法把optionId和questionId隐藏掉，questionId要等于生成的key
     private String questionOptions;
 }

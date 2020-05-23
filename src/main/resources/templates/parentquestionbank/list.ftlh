@@ -8,7 +8,6 @@
     <div id="page-content-wrapper">
         <div class="container-fluid">
             <div class="row clearfix">
-                <#--        列表-->
                 <div class="col-md-12 column">
                     <table class="table table-bordered table-hover table-condensed">
                         <thead>
@@ -66,20 +65,20 @@
                         <#if currentPage lte 1>
                             <li class="disabled"><a href="#">上页</a></li>
                         <#else>
-                            <li><a href="/tosee_writest/operator/questionbank/pqblist?page=${currentPage - 1}&size=${size}">上页</a></li>
+                            <li><a href="/toseewritest/operator/questionbank/pqblist?page=${currentPage - 1}&size=${size}">上页</a></li>
                         </#if>
                         <#list 1..parentQuestionBankDTOPage.getTotalPages() as index>
                             <#if currentPage == index>
                                 <li class="disabled"><a href="#">${index}</a></li>
                             <#else>
-                                <li><a href="/tosee_writest/operator/questionbank/pqblist?page=${index}&size=${size}">${index}</a></li>
+                                <li><a href="/toseewritest/operator/questionbank/pqblist?page=${index}&size=${size}">${index}</a></li>
                             </#if>
                         </#list>
 
                         <#if currentPage gte parentQuestionBankDTOPage.getTotalPages()>
                             <li class="disabled"><a href="#">下页</a></li>
                         <#else>
-                            <li><a href="/tosee_writest/operator/questionbank/pqblist?page=${currentPage + 1}&size=${size}">下页</a></li>
+                            <li><a href="/toseewritest/operator/questionbank/pqblist?page=${currentPage + 1}&size=${size}">下页</a></li>
                         </#if>
 
                     </ul>
@@ -88,9 +87,5 @@
         </div>
     </div>
 </div>
-
-
-<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-<script src="https://cdn.bootcss.com/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
 </body>
 </html>

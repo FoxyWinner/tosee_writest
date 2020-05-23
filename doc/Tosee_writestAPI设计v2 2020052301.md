@@ -14,13 +14,13 @@ https://toseewritest.mynatapp.cc//toseewritest/wechat/auth?code=123456
 
 仅当侯俊杰电脑打开内网穿透并运行Web程序时可用
 
-## 登录篇
+## 我的信息篇
 
 ### 登录✅
 
 在调用wx.login()拿到code之后，以该code为参数向我们的服务器发出请求以换取openid
 
-```
+```http
 GET /wechat/auth
 ```
 
@@ -38,6 +38,129 @@ code: 2133123123
     "msg": "成功",
     "data": {
       "openid":"on62f4kYUBt-AvuY11BcNNsCE4Ko"
+    }
+}
+```
+
+### 保存用户信息✅
+
+```http
+POST /wechat/saveinfo
+```
+
+参数
+
+```json
+openid:
+wechatId: // 微信号选填
+userName: // 昵称
+gender: //性别1男2女3其他
+profilePhotoUrl: // 头像URL
+
+eduDegree: //1国内本科2海外本科3硕士研究生4博士研究生5其他
+university: // 大学名
+graduationTime: //毕业时间，yyyy/MM格式
+
+targetFields:[1,3] // 目标领域，数组
+targetPositions:[1,3,4] // 目标岗位，数组
+```
+
+返回
+
+```json
+{
+    "code": 0,
+    "msg": "成功"
+}
+```
+
+### 获取用户简要信息✅
+
+```http
+GET /wechat/getminiinfo
+```
+
+参数
+
+```
+openid:osL8-5WbE-o4K8zcurUf6HRRnf54
+```
+
+返回
+
+```json
+{
+    "code": 0,
+    "msg": "成功",
+    "data": {
+        "profilePhotoUrl": "http://pic1.zhimg.com/50/v2-fce4f8a778fe3f24bca2cafc709b6847_hd.jpg",
+        "userName": "惊天动地阳光大男孩",
+        "authorised": 1,
+        "targetFields": [
+            "互联网",
+            "快消"
+        ],
+        "targetPositions": [
+            "产品",
+            "设计",
+            "市场"
+        ]
+    }
+}
+```
+
+### 获取用户信息✅
+
+```http
+GET /wechat/getinfo
+```
+
+参数
+
+```
+openid:osL8-5WbE-o4K8zcurUf6HRRnf54
+```
+
+返回
+
+```json
+{
+    "code": 0,
+    "msg": "成功",
+    "data": {
+        "wechatId": "houjunjie1015",
+        "userName": "惊天动地阳光大男孩",
+        "gender": "男",
+        "profilePhotoUrl": "http://pic1.zhimg.com/50/v2-fce4f8a778fe3f24bca2cafc709b6847_hd.jpg",
+        "authorised": 1,
+        "eduDegree": "硕士研究生",
+        "university": "北京邮电大学",
+        "major": "计算机技术",
+        "graduationTime": "2018/06",
+        "targetFields": [
+            {
+                "fieldType": 1,
+                "fieldName": "互联网"
+            },
+            {
+                "fieldType": 3,
+                "fieldName": "快消"
+            }
+        ],
+        "targetPositions": [
+            {
+                "positionType": 1,
+                "positionName": "产品"
+            },
+            {
+                "positionType": 3,
+                "positionName": "设计"
+            },
+            {
+                "positionType": 4,
+                "positionName": "市场"
+            }
+        ]
     }
 }
 ```
@@ -97,21 +220,19 @@ GET /writester/position/list
 
 Response_description:略
 
-### 企业真题主题库列表✅
+### 企业真题主题库列表✅0522更改岗位多选功能
 
 该请求返回一个父题库列表
 
-示例：https://toseewritest.mynatapp.cc/toseewritest/writester/questionbank/enterpriseqblist?openid=osL8-5Wd-xYNiASJVjv59tDB-JzA&positionType=3&collation=0
-
 ```http
-GET /writester/questionbank/enterpriseqblist
+POST /writester/questionbank/enterpriseqblist
 ```
 
 参数
 
 ```json
 openid: osL8-5Wd-xYNiASJVjv59tDB-JzA
-positionType: 3 // 岗位编号
+positionTypes:[2,3,4] // 岗位编号，最多传三个
 collation: 1 // 0时间降序，1热度降序
 
 //下面两个参数后期数据量大时做分页才用得到
@@ -766,7 +887,7 @@ size: 10 //每页所含条目大小，该字段可不传，服务器端默认siz
 }
 ```
 
-### 收藏夹列表✅
+### 收藏夹列表（type为3时已设计但暂未实现）
 
 ```http
 GET /writester/review/collectlist
@@ -829,7 +950,7 @@ size: 10 //每页所含条目大小，该字段可不传，服务器端默认siz
     "msg": "成功",
     "data": [
         {
-            "childQbId":"123457",
+            "collectBookId":"123457",
           	"collectNumber":6, //本子题库中你收藏过的题目数量
             "title": "收藏题目虚拟子题库1",
           	"updateTime": "2022/4/23" // 子题库中最新收藏的题目的收藏时间
@@ -841,7 +962,29 @@ size: 10 //每页所含条目大小，该字段可不传，服务器端默认siz
 }
 ```
 
-当type为3时，返回收藏文章列表：**暂无**
+当type为3时，返回收藏文章列表：
+
+``` json
+{
+    "code": 0,
+    "msg": "成功",
+    "data": [
+        {
+            "articleId":"123457",
+          	"title":"笔经干货1",
+          	"tags":"互联网",
+          	"type":1, // 1笔经2网申
+          	"readNum": 5000,
+          	"author":"liuyubobobo",
+        },
+        {
+					...
+        },
+    ]
+}
+```
+
+
 
 ### 收藏夹题目练习✅
 
@@ -1087,3 +1230,115 @@ recordId:"15887760531851368911"
     "msg": "成功"
 }
 ```
+
+
+
+## 笔经干货篇
+
+### 获取标签列表
+
+用于标签筛选
+
+```http
+GET /writester/experience/taglist
+```
+
+参数
+
+```json
+openid: on62f4kYUBt-AvuY11BcNNsCE4Ko
+```
+
+返回
+
+``` json
+{
+    "code": 0,
+    "msg": "成功",
+    "data": [
+        {
+            "tagId":"1",
+          	"tagName":"互联网"
+        },
+        {
+						"tagId":"2",
+          	"tagName":"行政"
+        },
+    ]
+}
+```
+
+### 获取文章列表
+
+```http
+GET /writester/experience/articlelist
+```
+
+参数
+
+```json
+openid: on62f4kYUBt-AvuY11BcNNsCE4Ko
+tagId:1  // 
+search:"搜索关键字"
+
+page: 0 //从第0页开始，该字段可不传，服务器端默认为第0页
+size: 10 //每页所含条目大小，该字段可不传，服务器端默认size为10
+```
+
+返回
+
+``` json
+{
+    "code": 0,
+    "msg": "成功",
+    "data": [
+        {
+            "articleId":"123457",
+          	"title":"笔经干货1",
+          	"tag":"互联网",
+          	"type":1, // 1笔经2网申
+          	"readNum": 5000,
+          	"author":"liuyubobobo",
+          	"iconUrl":"http://..."
+        },
+        {
+					...
+        },
+    ]
+}
+```
+
+### 获取文章内容
+
+```http
+GET /writester/experience/articlecontent
+```
+
+参数
+
+```json
+openid: on62f4kYUBt-AvuY11BcNNsCE4Ko
+articleId: 123457
+```
+
+返回
+
+``` json
+{
+    "code": 0,
+    "msg": "成功",
+    "data": 
+       {
+            "articleId":"123457",
+          	"title":"笔经干货1",
+          	"tag":"互联网",
+          	"author":"liuyubobobo",
+         		"collectState":0,
+            "readerNum": 5000,
+         		"relaseTime":"2020-04-21",
+         		"content":"Article-content格式，略"
+        }
+}
+```
+
+### 

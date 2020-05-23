@@ -14,7 +14,7 @@
                         <thead>
                         <tr>
                             <th>所属父题库</th>
-                            <th>子题库ID</th>
+<#--                            <th>子题库ID</th>-->
                             <th>子题库名</th>
                             <th>题目数</th>
                             <th>模拟时长</th>
@@ -27,7 +27,7 @@
                         <#list childQuestionBankPage.content as childQuestionBank>
                             <tr>
                                 <td>${childQuestionBank.parentQbId}</td>
-                                <td>${childQuestionBank.childQbId}</td>
+<#--                                <td>${childQuestionBank.childQbId}</td>-->
                                 <td>${childQuestionBank.cqbTitle}</td>
                                 <td>${childQuestionBank.questionNumber}</td>
                                 <td>${childQuestionBank.simulationTime}分钟</td>
@@ -56,20 +56,20 @@
                         <#if currentPage lte 1>
                             <li class="disabled"><a href="#">上页</a></li>
                         <#else>
-                            <li><a href="/tosee_writest/operator/questionbank/cqblist?page=${currentPage - 1}&size=${size}">上页</a></li>
+                            <li><a href="/toseewritest/operator/questionbank/cqblist?page=${currentPage - 1}&size=${size}">上页</a></li>
                         </#if>
                         <#list 1..childQuestionBankPage.getTotalPages() as index>
                             <#if currentPage == index>
                                 <li class="disabled"><a href="#">${index}</a></li>
                             <#else>
-                                <li><a href="/tosee_writest/operator/questionbank/cqblist?page=${index}&size=${size}">${index}</a></li>
+                                <li><a href="/toseewritest/operator/questionbank/cqblist?page=${index}&size=${size}">${index}</a></li>
                             </#if>
                         </#list>
 
                         <#if currentPage gte childQuestionBankPage.getTotalPages()>
                             <li class="disabled"><a href="#">下页</a></li>
                         <#else>
-                            <li><a href="/tosee_writest/operator/questionbank/cqblist?page=${currentPage + 1}&size=${size}">下页</a></li>
+                            <li><a href="/toseewritest/operator/questionbank/cqblist?page=${currentPage + 1}&size=${size}">下页</a></li>
                         </#if>
 
                     </ul>

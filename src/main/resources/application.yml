@@ -8,15 +8,11 @@ spring:
     show-sql: true
   jackson:
     default-property-inclusion: non_null
-#  #老师没提到过的，不加下面这句访问不到css
-#  resources:
-#    static-locations: classpath:/
-  redis:
-    #默认其实就是这个
-    host: 127.0.0.1
-    port: 6379
-#  freemarker:
-#    suffix:.ftl
+
+#  redis:
+#    #默认其实就是这个
+#    host: 127.0.0.1
+#    port: 6379
 
 wechat:
   miniapp:

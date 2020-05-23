@@ -15,6 +15,7 @@ import com.tosee.tosee_writest.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -50,9 +51,9 @@ public class WritesterQuestionBankController
     @Autowired
     private MistakeBookService mistakeBookService;
 
-    @GetMapping("/enterpriseqblist")
-    public ResultVO parentQuestionBankList(@RequestParam("openid") String openid,
-                                           @RequestParam("positionType") Integer positionType,
+    @PostMapping("/enterpriseqblist")
+    public ResultVO parentQuestionBankListTest(@RequestParam("openid") String openid,
+                                           @RequestParam(value = "positionTypes" ,required=false) List<Integer> positionTypes,
                                            @RequestParam(value = "collation", defaultValue = "1")Integer collation,
 
                                            @RequestParam(value = "page",defaultValue = "0") Integer page,
@@ -60,20 +61,24 @@ public class WritesterQuestionBankController
     {
         if(StringUtils.isEmpty(openid))
         {
-            log.error("【查询子题库列表】openid为空");
+            log.error("【企业真题子题库列表】openid为空");
             throw new WritestException(ResultEnum.PARAM_ERROR);
         }
-
-        if(StringUtils.isEmpty(positionType))
-        {
-            log.error("【查询子题库列表】positionType为空");
-            throw new WritestException(ResultEnum.PARAM_ERROR);
-        }
-
 
         List<ParentQuesitonBankVO> questionBankVOList = new ArrayList<>();
-        List<ParentQuestionBank> questionBankList = questionBankService.findPQBListByPositionTypeAndPqbTypeOrderBy(positionType, ParentQuestionBankTypeEnum.ENTERPRISE_BANK.getCode(), EnumUtil.getByCode(collation, QuestionBankSortEnum.class));
+        List<ParentQuestionBank> questionBankList;
+        if(CollectionUtils.isEmpty(positionTypes))
+        {
+            // 不传positionTypes的时候应该返回推荐列表
+            questionBankList = questionBankService.findEPQBListRecommendedOrderBy(EnumUtil.getByCode(collation, QuestionBankSortEnum.class));
+        }
+        else
+        {
+            // 传了的话按照选择的岗位返回主题库列表
+            questionBankList = questionBankService.findEPQBListByPositionTypesAndPqbTypeOrderBy(positionTypes, EnumUtil.getByCode(collation, QuestionBankSortEnum.class));
+        }
 
+        // 转VO
         for (ParentQuestionBank questionBank : questionBankList)
         {
             ParentQuesitonBankVO parentQuesitonBankVO = new ParentQuesitonBankVO();
@@ -88,7 +93,6 @@ public class WritesterQuestionBankController
 
         return ResultVOUtil.success(questionBankVOList);
     }
-
     @GetMapping("/childqblist")
     public ResultVO childQuestionBankList(@RequestParam("openid") String openid,
                                           @RequestParam("pqbId") String pqbId,
@@ -237,7 +241,8 @@ public class WritesterQuestionBankController
             if(practiceRecordDTO!=null)
                 if(practiceRecord.getCorrectRatio() == -1) // 按照规定，正确率等于-1时说明这条做题记录 未完成或者没开始
                 {
-                    questionVO.setUserAnswer(practiceRecordDTO.getUserAnswerList().get(questionVO.getQuestionSeq()-1));
+                    if(!CollectionUtils.isEmpty(practiceRecordDTO.getUserAnswerList()))
+                        questionVO.setUserAnswer(practiceRecordDTO.getUserAnswerList().get(questionVO.getQuestionSeq()-1));
                 }
 
 
@@ -298,6 +303,8 @@ public class WritesterQuestionBankController
                 {
                     QuestionOptionVO questionOptionVO = new QuestionOptionVO();
                     BeanUtils.copyProperties(questionOption,questionOptionVO);
+                    // seq要重设
+                    questionVO.setQuestionSeq(i+1);
                     questionOptionVOList.add(questionOptionVO);
                 }
 

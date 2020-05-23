@@ -1,3 +1,5 @@
+[TOC]
+
 # 兔希刷题数据库设计
 
 ## 一、用户篇
@@ -9,31 +11,32 @@ create table `user`(
   
   /* 用户ID */
 
-  `user_id` varchar(32) not null,
+  `user_id` varchar(32) not null ,
+  
+  `openid` varchar(64) not null comment '微信openid，可依次向微信拉取用户微信头像和昵称',
+  
+  `wechat_id` varchar(32)  comment '微信号，选填',
 
   /* 用户基本信息 */
-  
-  `open_id` varchar(64) not null comment '微信openid，可依次向微信拉取用户微信头像和昵称',
   
   `user_name` varchar(64) comment '微信昵称，通过openid拉取',
 
   `gender` varchar(2) comment '性别，似乎可以从微信拉取',
   
+  `profile_photo_url` varchar(64) comment '头像URL',  
+  
    /* 教育背景 */
+	`edu_degree` tinyint(3) comment '教育程度：1国内本科2海外本科3硕士研究生4博士研究生5其他',
 
   `university` varchar(64) comment '学校名称',
-
-  `college` varchar(64) comment '学院名称',
   
-  `edu_degree` varchar(16) comment '教育程度：本科，硕士，博士，其他',
-  
-  `graduation_year` varchar(16) comment '毕业年份（可判断出应届非应届）',
+  `graduation_time` varchar(16) comment '毕业年月（可判断出应届非应届）',
   
    /* 求职背景 */
 
-  `target_field` varchar(64) comment '目标领域（互联网等）',
+  `target_fields` varchar(64) comment '目标领域（互联网等）',
 
-  `target_positon` varchar(64) comment '目标岗位（算法、前台、后台等）',
+  `target_positons` varchar(64) comment '目标岗位（算法、前台、后台等）',
 
   /* 时间戳 */
 
@@ -43,8 +46,6 @@ create table `user`(
   
   primary key (`user_id`),
   UNIQUE KEY `uqe_open_id` (`open_id`) 
-  
-  /*  CONSTRAINT gender CHECK (sex in('男','女')));*/
 );
 ```
 
@@ -276,29 +277,31 @@ create table `work_position`(
 
 ## 四、笔经篇
 
-### 笔经干货
+### 笔经干货✅
 
 ```mysql
 create table `experience_article`(
   /* ID */
   `article_id` varchar(32) not null,
   
+  /* 推荐 */
+  `is_recommended` tinyint(3) default 0 not null comment '是否推荐',
+  
   /* 文章信息 */
-  `article_type` tinyint(3) COMMENT '文章类别,1笔经2网申',
+  `article_type` tinyint(3) default 0 COMMENT '文章类别,0普通，预留字段',
   
-  `article_tags` varchar(64) comment '文章标签,json格式',
+  `article_tag_id` varchar(64) comment '文章标签,id列表',
   
-  `article_icon` varchar(64) comment '文章icon',
+  `article_icon` varchar(128) comment '文章iconurl',
   
-  `reader_number` int COMMENT '多少人读过，这个也可以作为TAB为“热点”时的排序依据',
+  `reader_number` int default 0 not null comment '多少人读过，“热点”时的排序依据',
   
   `author` varchar(32) comment '作者名',
   
   /* 文章内容 */
   
-  `content` varchar(512) comment '文章内容，HTML富文本存储',
-  
-  `relase_time` varchar(32) comment '发布时间精确到日，例20181108',
+  `content` text comment '文章内容，HTML富文本存储',
+ 
   
   /* 时间戳 */
   `create_time` timestamp not null default current_timestamp comment '创建时间',
@@ -308,11 +311,30 @@ create table `experience_article`(
 );
 ```
 
+### 文章标签✅
+
+```mysql
+create table `article_tag`(
+  /* ID */
+  `tag_id`  int not null auto_increment,
+  
+  /* 标签信息 */
+  `tag_name` varchar(64) not null comment '标签名',
+  
+  `tag_heat` int not null comment '标签热度',
+ 
+  
+  /* 时间戳 */
+  `create_time` timestamp not null default current_timestamp comment '创建时间',
+  `update_time`  timestamp not null default current_timestamp on update current_timestamp comment '修改时间',
+  
+	primary key (`tag_id`)
+);
+```
 
 
 
 
-题目的讨论区先放一放，
 
 ## 五、半论坛
 

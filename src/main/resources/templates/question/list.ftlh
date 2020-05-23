@@ -8,12 +8,11 @@
     <div id="page-content-wrapper">
         <div class="container-fluid">
             <div class="row clearfix">
-                <#--        列表-->
                 <div class="col-md-12 column">
                     <table class="table table-bordered table-hover table-condensed">
                         <thead>
                         <tr>
-                            <th>题目ID</th>
+<#--                            <th>题目ID</th>-->
                             <th>所属子题库</th>
                             <th>题目类型</th>
                             <th>序号</th>
@@ -27,8 +26,8 @@
                         <tbody>
                         <#list questionDTOPage.content as questionDTO>
                             <tr>
-                                <td>${questionDTO.questionId}</td>
-                                <td>${questionDTO.childQbId}</td>
+<#--                                <td>${questionDTO.questionId}</td>-->
+                                <td>${questionDTO.childQbTitle}</td>
                                 <td>${questionDTO.getQuestionTypeEnum().message}</td>
                                 <td>${questionDTO.questionSeq}</td>
                                 <td>${questionDTO.questionStem}</td>
@@ -45,6 +44,9 @@ i
                                 <td>
                                     <a href="/toseewritest/operator/questionbank/questionindex?questionId=${questionDTO.questionId}" >修改</a>
                                 </td>
+<#--                                <td>-->
+<#--                                    <a href="/toseewritest/operator/questionbank/questionindextest?questionId=${questionDTO.questionId}" >修改（测试用）</a>-->
+<#--                                </td>-->
 
                                 <td>
                                     <a href="/toseewritest/operator/questionbank/questiondelete?questionId=${questionDTO.questionId}">删除</a>
@@ -60,20 +62,20 @@ i
                         <#if currentPage lte 1>
                             <li class="disabled"><a href="#">上页</a></li>
                         <#else>
-                            <li><a href="/tosee_writest/operator/questionbank/questionlist?page=${currentPage - 1}&size=${size}">上页</a></li>
+                            <li><a href="/toseewritest/operator/questionbank/questionlist?page=${currentPage - 1}&size=${size}">上页</a></li>
                         </#if>
                         <#list 1..questionDTOPage.getTotalPages() as index>
                             <#if currentPage == index>
                                 <li class="disabled"><a href="#">${index}</a></li>
                             <#else>
-                                <li><a href="/tosee_writest/operator/questionbank/questionlist?page=${index}&size=${size}">${index}</a></li>
+                                <li><a href="/toseewritest/operator/questionbank/questionlist?page=${index}&size=${size}">${index}</a></li>
                             </#if>
                         </#list>
 
                         <#if currentPage gte questionDTOPage.getTotalPages()>
                             <li class="disabled"><a href="#">下页</a></li>
                         <#else>
-                            <li><a href="/tosee_writest/operator/questionbank/questionlist?page=${currentPage + 1}&size=${size}">下页</a></li>
+                            <li><a href="/toseewritest/operator/questionbank/questionlist?page=${currentPage + 1}&size=${size}">下页</a></li>
                         </#if>
 
                     </ul>
@@ -82,7 +84,6 @@ i
         </div>
     </div>
 </div>
-
 
 <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
 <script src="https://cdn.bootcss.com/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>

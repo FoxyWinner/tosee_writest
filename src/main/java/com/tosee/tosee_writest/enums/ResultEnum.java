@@ -25,6 +25,8 @@ public enum ResultEnum
 
     COLLECT_QUESTION_NOT_EXIST(27,"用户收藏集中没有该题目"),
 
+    OPTIONS_IS_EMPTY(28,"单选题和多选题选项不能为空"),
+
 
     WECHAT_MA_EMPTY_JSCODE(30, "JSCODE为空"),
 

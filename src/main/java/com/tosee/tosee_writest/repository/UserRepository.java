@@ -1,7 +1,7 @@
 package com.tosee.tosee_writest.repository;
 
-import com.tosee.tosee_writest.dataobject.Mistake;
 import com.tosee.tosee_writest.dataobject.MistakeBook;
+import com.tosee.tosee_writest.dataobject.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -10,10 +10,7 @@ import java.util.List;
  * @Author: FoxyWinner
  * @Date: 2020/4/29 4:48 下午
  */
-public interface MistakeBookRepository extends JpaRepository<MistakeBook, String>
+public interface UserRepository extends JpaRepository<User, String>
 {
-    MistakeBook findByOpenidAndCqbId(String openid, String cqbid);
-
-    List<MistakeBook> findByOpenid(String openid);
-
+    User findByOpenid(String openid);
 }

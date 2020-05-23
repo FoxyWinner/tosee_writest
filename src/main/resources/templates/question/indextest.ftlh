@@ -16,13 +16,12 @@
                     <form role="form" method="post" action="/toseewritest/operator/questionbank/questionsave" id="questionForm" data-toggle="validator">
                         <div class="form-group">
                             <label>所属子题库</label>
-                            <select name="childQbId" id="childQbId" class="form-control" data-error="子题库必选" required>
-                                <option value="">请选择子题库</option>
+                            <select name="childQbId" id="childQbId" class="form-control" data-error="子题库必选">
+                                <option>请选择子题库</option>
                                 <#list childQuestionBankList as childQuestionBank>
                                 <#--                                    两个问号是"如果存在"的意思-->
                                     <option value="${childQuestionBank.childQbId}"
-                                            <#if ((questionDTO.childQbId)?? && questionDTO.childQbId == childQuestionBank.childQbId) ||
-                                            (lastChildQbId?? && lastChildQbId == childQuestionBank.childQbId)>
+                                            <#if (questionDTO.childQbId)?? && questionDTO.childQbId == childQuestionBank.childQbId>
                                                 selected
                                             </#if>
                                     >${childQuestionBank.cqbTitle}
@@ -34,8 +33,8 @@
 
                         <div class="form-group">
                             <label>题目类型</label>
-                            <select name="questionType" id="questionType" class="form-control" data-error="题目类型必选" required onchange="questionTypeChange()">
-                                <option value="">请选择题目类型</option>
+                            <select name="questionType" id="questionType" class="form-control" data-error="题目类型必选" onchange="questionTypeChange()">
+                                <option>请选择题目类型</option>
                                 <#list typeEnumList as typeEnum>
                                     <option value="${typeEnum.code}"
                                             <#if (questionDTO.questionType)?? && questionDTO.questionType == typeEnum.code>
@@ -64,34 +63,39 @@
 
                         <div class="form-group">
                             <label>解析</label>
-                            <input name="explanation" type="text" class="form-control" data-error="答案必填" required value="${(questionDTO.explanation)!''}"/>
+                            <input name="explanation" type="text" class="form-control" data-error="解析必填" required value="${(questionDTO.explanation)!''}"/>
                             <div class="help-block with-errors"></div>
                         </div>
 
                         <div class="form-group" id="questionOptionsDiv">
-                            <label>选项</label>
-                            <p class="help-block" id="options-help-block">
-                                修改题目时，optionId和questionId不要改写！
-                            </p>
-                            <textarea name="questionOptions" id="questionOptions" class="form-control" rows="20" data-error="选项必填" required>${(questionDTO.getOptionsJson())!''}</textarea>
+                            <textarea name="questionOptions" hidden id="questionOptions" class="form-control" rows="20" data-error="选项必填" required>${(questionDTO.getOptionsJson())!''}</textarea>
                             <div class="help-block with-errors"></div>
                         </div>
 
+                        <div class="form-group">
+                            <label>选项</label>
+                        </div>
+
 <#--                        freemarkerjson解析-->
-<#--                        <#if questionDTO??>-->
-<#--                            <#assign optionsJson="${questionDTO.getOptionsJson()}"?eval />-->
-<#--                            <#list optionsJson as optionJson>-->
-<#--                                ${optionJson.optionName}:${optionJson.optionValue}-->
-<#--                            </#list>-->
-<#--                        </#if>-->
+                        <#if questionDTO??>
+                            <#assign optionsJson="${questionDTO.getOptionsJson()}"?eval />
+                            <#list optionsJson as optionJson>
+                            <div class="form-group">
+                                    <div class="input-group" >
+                                        <span class="input-group-addon">${optionJson.optionName}</span>
+                                        <input type="text" class="form-control"  value="${optionJson.optionValue}">
+                                    </div>
+                            </div>
+                            </#list>
+                        </#if>
+
+
 
 
 
                         <#--                        隐藏的字段 为了传给save-->
                         <input hidden type="text" name="questionId" value="${(questionDTO.questionId)!''}">
                         <button type="submit" class="btn btn-danger">提交</button>
-<#--                        <button type="button" class="btn btn-danger" id="submitBtn">提交（正在测试请勿使用）</button>-->
-
                     </form>
                 </div>
             </div>
@@ -149,28 +153,4 @@
             $("#questionForm").validator('update');
         }
     }
-
-    // $("#submitBtn").click(function()
-    // {
-    //     // 先校验，校验通过才走提交流程
-    //     if($("#questionForm").validator('validate'))
-    //     {
-    //         var targetUrl = $("#questionForm").attr("action")+"ajax";
-    //         var data = $("#questionForm").serialize();
-    //         $.ajax({
-    //             type:'post',
-    //             url:targetUrl,
-    //             cache: false,
-    //             data:data,  //重点必须为一个变量如：data
-    //             dataType:'json',
-    //             success:function(data){
-    //                 alert('添加成功');
-    //                 console.log(data);
-    //             },
-    //             error:function(){
-    //                 alert("添加失败")
-    //             }
-    //         })
-    //     }
-    // })
 </script>
