@@ -62,30 +62,38 @@ i
                         <#if currentPage lte 1>
                             <li class="disabled"><a href="#">上页</a></li>
                         <#else>
-                            <li><a href="/toseewritest/operator/questionbank/questionlist?page=${currentPage - 1}&size=${size}">上页</a></li>
+                            <#if currentchildQbId?? >
+                                <li><a href="/toseewritest/operator/questionbank/questionlist?childQbId=${currentchildQbId}&page=${currentPage - 1}&size=${size}">上页</a></li>
+                            <#else>
+                                <li><a href="/toseewritest/operator/questionbank/questionlist?page=${currentPage - 1}&size=${size}">上页</a></li>
+                            </#if>
                         </#if>
                         <#list 1..questionDTOPage.getTotalPages() as index>
                             <#if currentPage == index>
                                 <li class="disabled"><a href="#">${index}</a></li>
                             <#else>
-                                <li><a href="/toseewritest/operator/questionbank/questionlist?page=${index}&size=${size}">${index}</a></li>
+                                <#if currentchildQbId?? >
+                                    <li><a href="/toseewritest/operator/questionbank/questionlist?childQbId=${currentchildQbId}&page=${index}&size=${size}">${index}</a></li>
+                                <#else>
+                                    <li><a href="/toseewritest/operator/questionbank/questionlist?page=${index}&size=${size}">${index}</a></li>
+                                </#if>
                             </#if>
                         </#list>
 
                         <#if currentPage gte questionDTOPage.getTotalPages()>
                             <li class="disabled"><a href="#">下页</a></li>
                         <#else>
-                            <li><a href="/toseewritest/operator/questionbank/questionlist?page=${currentPage + 1}&size=${size}">下页</a></li>
+                                <#if currentchildQbId?? >
+                                    <li><a href="/toseewritest/operator/questionbank/questionlist?childQbId=${currentchildQbId}&page=${currentPage + 1}&size=${size}">下页</a></li>
+                                <#else>
+                                    <li><a href="/toseewritest/operator/questionbank/questionlist?page=${currentPage + 1}&size=${size}">下页</a></li>
+                                </#if>
                         </#if>
-
                     </ul>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-<script src="https://cdn.bootcss.com/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
 </body>
 </html>

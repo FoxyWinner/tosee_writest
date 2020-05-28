@@ -12,7 +12,8 @@ import java.util.List;
  * @Author: FoxyWinner
  * @Date: 2020/4/29 4:47 下午
  */
-public interface ArticleTagRepository extends JpaRepository<ArticleTag, String>
+public interface ArticleTagRepository extends JpaRepository<ArticleTag, Integer>
 {
+
 
 }

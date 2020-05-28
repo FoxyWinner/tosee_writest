@@ -96,7 +96,7 @@ public class MistakeBookServiceImpl implements MistakeBookService
     @Override
     public List<MistakeBookDTO> findAllMistakeBooks(String openid)
     {
-        List<MistakeBook> mistakeBookList = mistakeBookRepository.findByOpenid(openid);
+        List<MistakeBook> mistakeBookList = mistakeBookRepository.findByOpenidOrderByUpdateTimeDesc(openid);
         List<MistakeBookDTO> result = new ArrayList<>();
         for (MistakeBook mistakeBook : mistakeBookList)
         {

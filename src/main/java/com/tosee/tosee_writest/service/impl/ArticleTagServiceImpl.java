@@ -25,4 +25,12 @@ public class ArticleTagServiceImpl implements ArticleTagService
     {
         return articleTagRepository.findAll();
     }
+
+    @Override
+    public String getTagName(Integer tagId)
+    {
+        ArticleTag articleTag = articleTagRepository.findById(tagId).orElse(null);
+        if (articleTag == null) return null;
+        return articleTag.getTagName();
+    }
 }

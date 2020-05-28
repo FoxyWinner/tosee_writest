@@ -45,7 +45,7 @@
 
                         <div class="form-group">
                             <label>热度</label>
-                            <input name="cqbHeat" type="text" class="form-control" value="${(childQuestionBank.cqbHeat)!''}"/>
+                            <input name="cqbHeat" type="text" class="form-control" value="${(childQuestionBank.cqbHeat?c)!''}"/>
                         </div>
 
                         <div class="form-group">

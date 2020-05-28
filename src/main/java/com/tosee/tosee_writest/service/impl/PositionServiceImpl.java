@@ -41,6 +41,24 @@ public class PositionServiceImpl implements PositionService
     }
 
     @Override
+    public List<WorkPosition> findAllPositionsByPQBType(Integer pqbType)
+    {
+        // 过滤岗位综合
+        List<WorkPosition> allPositions = workPositionRepository.findByPqbType(pqbType);
+        List<WorkPosition> resultPositions = new ArrayList<>();
+
+        for (WorkPosition workPosition : allPositions)
+        {
+            if(workPosition.getPositionType() != 0)
+            {
+                resultPositions.add(workPosition);
+            }
+        }
+
+        return resultPositions;
+    }
+
+    @Override
     public List<WorkPosition> findAllPositions()
     {
         // 过滤岗位综合
@@ -60,9 +78,9 @@ public class PositionServiceImpl implements PositionService
 
 
     @Override
-    public List<WorkPosition> findByFieldType(Integer fieldType)
+    public List<WorkPosition> findByFieldTypeAndPQBType(Integer fieldType, Integer pqbType)
     {
-        return workPositionRepository.findByFieldType(fieldType);
+        return workPositionRepository.findByFieldTypeAndPqbType(fieldType,pqbType);
     }
 
     @Override

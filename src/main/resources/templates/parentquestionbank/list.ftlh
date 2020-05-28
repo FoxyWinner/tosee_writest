@@ -12,7 +12,7 @@
                     <table class="table table-bordered table-hover table-condensed">
                         <thead>
                         <tr>
-                            <th>主题库ID</th>
+<#--                            <th>主题库ID</th>-->
                             <th>题库类型</th>
                             <th>名称</th>
                             <th>公司</th>
@@ -28,7 +28,7 @@
                         <tbody>
                         <#list parentQuestionBankDTOPage.content as parentQuestionBankDTO>
                             <tr>
-                                <td>${parentQuestionBankDTO.parentQbId}</td>
+<#--                                <td>${parentQuestionBankDTO.parentQbId}</td>-->
                                 <td>${parentQuestionBankDTO.getParentQuestionBankTypeEnum().message}</td>
                                 <td>${parentQuestionBankDTO.pqbTitle}</td>
                                 <td>
@@ -37,7 +37,7 @@
                                     </#if>
                                 </td>
                                 <td>${parentQuestionBankDTO.workField.fieldName}</td>
-                                <td>${parentQuestionBankDTO.workPosition.positionName}</td>
+                                <td>${parentQuestionBankDTO.workPosition.positionName}(${parentQuestionBankDTO.getPositionPqbTypeName()})</td>
                                 <td>${parentQuestionBankDTO.cqbNumber}</td>
                                 <td>${parentQuestionBankDTO.isRecommended}</td>
                                 <td>${parentQuestionBankDTO.pqbHeat}</td>
@@ -48,9 +48,13 @@
                                 </td>
 
                                 <td>
-                                    <a href="/toseewritest/operator/questionbank/pqbrecommend?parentQbId=${parentQuestionBankDTO.parentQbId}">推荐</a>
-                                </td>
+                                    <#if parentQuestionBankDTO.isRelase == 0>
+                                        <a href="/toseewritest/operator/questionbank/pqbrelase?parentQbId=${parentQuestionBankDTO.parentQbId}">发布</a>
+                                    <#else>
+                                        <a href="/toseewritest/operator/questionbank/pqbcancelrelase?parentQbId=${parentQuestionBankDTO.parentQbId}">取消发布</a>
+                                    </#if>
 
+                                </td>
                                 <td>
                                     <a href="/toseewritest/operator/questionbank/cqblist?parentQbId=${parentQuestionBankDTO.parentQbId}">子题库</a>
                                 </td>

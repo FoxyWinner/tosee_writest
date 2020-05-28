@@ -5,6 +5,7 @@ import com.tosee.tosee_writest.dataobject.Company;
 import com.tosee.tosee_writest.dataobject.WorkField;
 import com.tosee.tosee_writest.dataobject.WorkPosition;
 import com.tosee.tosee_writest.enums.ParentQuestionBankTypeEnum;
+import com.tosee.tosee_writest.enums.PositionPQBTypeEnum;
 import com.tosee.tosee_writest.utils.EnumUtil;
 import com.tosee.tosee_writest.vo.WorkPostionVO;
 import lombok.Data;
@@ -47,6 +48,9 @@ public class ParentQuestionBankDTO
 
     private String relaseTime;
 
+    private Integer isRelase;
+
+
     /**
      * 返回对应状态的枚举类
      * @return
@@ -55,6 +59,16 @@ public class ParentQuestionBankDTO
     public ParentQuestionBankTypeEnum getParentQuestionBankTypeEnum()
     {
         return EnumUtil.getByCode(pqbType, ParentQuestionBankTypeEnum.class);
+    }
+
+    /**
+     * 返回对应岗位所属的类型
+     * @return
+     */
+    @JsonIgnore
+    public String getPositionPqbTypeName()
+    {
+        return EnumUtil.getByCode(workPosition.getPqbType(), PositionPQBTypeEnum.class).getMessage();
     }
 
 }

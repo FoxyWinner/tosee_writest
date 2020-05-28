@@ -79,7 +79,7 @@ public class PracticeRecordServiceImpl implements PracticeRecordService
     public List<PracticeRecordDTO> findAllRecordsByOpenid(String openid)
     {
         List<PracticeRecordDTO> result = new ArrayList<>();
-        List<PracticeRecord> practiceRecords = practiceRecordRepository.findByOpenId(openid);
+        List<PracticeRecord> practiceRecords = practiceRecordRepository.findByOpenIdOrderByUpdateTimeDesc(openid);
         for (PracticeRecord practiceRecord : practiceRecords)
         {
             PracticeRecordDTO recordDTO = PracticeRecord2PracticeRecordDTOConverter.convert(practiceRecord);

@@ -33,6 +33,16 @@
             </ul>
         </li>
 
+        <li class="dropdown open">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true"><i class="fa fa-fw fa-plus"></i> 笔经干货 <span class="caret"></span></a>
+            <ul class="dropdown-menu" role="menu">
+                <li class="dropdown-header">操作</li>
+                <li><a href="/toseewritest/operator/experience/articlelist">列表</a></li>
+                <li><a href=/toseewritest/operator/experience/articleindex>新增</a></li>
+                <#--                <li><a href=/toseewritest/operator/questionbank/questionindextest>新增(测试用)</a></li>-->
+            </ul>
+        </li>
+
 <#--        <li>-->
 <#--            <a href="/onlinestore/seller/logout"><i class="fa fa-fw fa-list-alt"></i> 登出</a>-->
 <#--        </li>-->

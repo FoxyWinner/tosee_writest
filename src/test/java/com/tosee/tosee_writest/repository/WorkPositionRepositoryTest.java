@@ -26,7 +26,7 @@ class WorkPositionRepositoryTest
     @Test
     @Transactional
     public void findByFieldTypeTest(){
-        List<WorkPosition> workPositions = repository.findByFieldType(1);
-        System.out.println(workPositions.toString());
+//        List<WorkPosition> workPositions = repository.findByFieldTypeAnd(1);
+//        System.out.println(workPositions.toString());
     }
 }

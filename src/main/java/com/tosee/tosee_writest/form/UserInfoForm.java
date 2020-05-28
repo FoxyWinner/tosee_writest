@@ -24,7 +24,7 @@ public class UserInfoForm
 
     private String profilePhotoUrl;
 
-    @NotNull(message = "是否已授权不能为空")
+    // 非毕传项目，当saveInfo触发时自动填1，数据库里默认为0
     private Integer authorised;
 
 

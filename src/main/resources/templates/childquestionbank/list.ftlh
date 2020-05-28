@@ -26,7 +26,7 @@
                         <tbody>
                         <#list childQuestionBankPage.content as childQuestionBank>
                             <tr>
-                                <td>${childQuestionBank.parentQbId}</td>
+                                <td>${childQuestionBank.parentQbTitle}</td>
 <#--                                <td>${childQuestionBank.childQbId}</td>-->
                                 <td>${childQuestionBank.cqbTitle}</td>
                                 <td>${childQuestionBank.questionNumber}</td>

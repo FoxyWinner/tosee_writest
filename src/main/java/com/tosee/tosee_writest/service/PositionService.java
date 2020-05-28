@@ -13,9 +13,11 @@ public interface PositionService
 {
     List<WorkField> findAllFields();
 
+    List<WorkPosition> findAllPositionsByPQBType(Integer pqbType);
+
     List<WorkPosition> findAllPositions();
 
-    List<WorkPosition> findByFieldType(Integer fieldType);
+    List<WorkPosition> findByFieldTypeAndPQBType(Integer fieldType,Integer pqbType);
 
     WorkField findFieldByType(Integer fieldType);
 

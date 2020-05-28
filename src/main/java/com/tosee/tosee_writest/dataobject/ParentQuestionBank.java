@@ -42,6 +42,8 @@ public class ParentQuestionBank
 
     private String relaseTime;
 
+    private Integer isRelase;
+
     public ParentQuestionBank()
     {
     }

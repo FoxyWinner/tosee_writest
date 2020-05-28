@@ -4,6 +4,7 @@ import lombok.Data;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.criteria.CriteriaBuilder;
 
@@ -18,6 +19,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 public class Company
 {
     @Id
+    @GeneratedValue
     private Integer companyId;
 
     private Integer fieldType;

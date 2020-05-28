@@ -51,16 +51,14 @@ POST /wechat/saveinfo
 参数
 
 ```json
-openid:
-wechatId: // 微信号选填
-userName: // 昵称
-gender: //性别1男2女3其他
-profilePhotoUrl: // 头像URL
-
-eduDegree: //1国内本科2海外本科3硕士研究生4博士研究生5其他
-university: // 大学名
-graduationTime: //毕业时间，yyyy/MM格式
-
+openid:on62f4kYUBt-AvuY11BcNNsCE4Ko
+wechatId: houjunjie1015// 微信号选填
+userName: 惊天动地阳光大男孩// 昵称
+gender: 1 //性别1男2女3其他
+profilePhotoUrl: http://pic1.zhimg.com/50/v2-fce4f8a778fe3f24bca2cafc709b6847_hd.jpg
+eduDegree: 1//1国内本科2海外本科3硕士研究生4博士研究生5其他
+university: 北京邮电大学// 大学名
+graduationTime: 2020年9月//毕业时间
 targetFields:[1,3] // 目标领域，数组
 targetPositions:[1,3,4] // 目标岗位，数组
 ```
@@ -165,18 +163,103 @@ openid:osL8-5WbE-o4K8zcurUf6HRRnf54
 }
 ```
 
-## 题库篇
+以下这俩接口估计以后还得做二级联动，要废弃
 
-### 行业和职位列表✅
+### 行业列表✅
 
-```
-GET /writester/position/list
+按照前端要求，data里统一为name和type
+
+```http
+GET /writester/position/fieldlist
 ```
 
 参数
 
 ```
 无
+```
+
+返回
+
+```json
+{
+    "code": 0,
+    "msg": "成功",
+    "data": [
+        {
+            "fieldType": 1,
+            "fieldName": "互联网"
+        },
+        {
+            "fieldType": 2,
+            "fieldName": "地产"
+        },
+        {
+            "fieldType": 3,
+            "fieldName": "快消"
+        },
+        {
+            "fieldType": 4,
+            "fieldName": "金融"
+        }
+    ]
+}
+```
+
+### 岗位列表✅
+
+按照前端要求，data里统一为name和type
+
+```http
+GET /writester/position/positionlist
+```
+
+参数
+
+```json
+type: 2  //0企业真题，1专业知识，2为“我的”专用
+```
+
+返回
+
+```json
+{
+    "code": 0,
+    "msg": "成功",
+    "data": [
+        {
+            "positionType": 1,
+            "positionName": "产品"
+        },
+        {
+            "positionType": 2,
+            "positionName": "运营"
+        },
+        {
+            "positionType": 3,
+            "positionName": "设计"
+        },
+        {
+            "positionType": 4,
+            "positionName": "市场"
+        },
+				...
+    ]
+}
+```
+
+## 题库篇
+
+### 行业和职位列表✅
+
+```http
+GET /writester/position/list
+```
+
+参数
+
+```json
+type: 0  //0企业真题，1专业知识，2为“我的”专用
 ```
 
 返回
@@ -220,7 +303,7 @@ GET /writester/position/list
 
 Response_description:略
 
-### 企业真题主题库列表✅0522更改岗位多选功能
+### 企业真题主题库列表✅
 
 该请求返回一个父题库列表
 
@@ -887,7 +970,7 @@ size: 10 //每页所含条目大小，该字段可不传，服务器端默认siz
 }
 ```
 
-### 收藏夹列表（type为3时已设计但暂未实现）
+### 收藏夹列表✅
 
 ```http
 GET /writester/review/collectlist
@@ -970,16 +1053,15 @@ size: 10 //每页所含条目大小，该字段可不传，服务器端默认siz
     "msg": "成功",
     "data": [
         {
-            "articleId":"123457",
-          	"title":"笔经干货1",
-          	"tags":"互联网",
-          	"type":1, // 1笔经2网申
-          	"readNum": 5000,
-          	"author":"liuyubobobo",
-        },
-        {
-					...
-        },
+            "articleId": "15898988952791222589",
+            "isRecommended": 1,
+            "author": "李童",
+            "secondTag": "第二标签",
+            "iconUrl": "https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=1109618770,2595587827&fm=11&gp=0.jpg",
+            "title": "李童Google产品心得",
+            "readNum": 212
+        }	,
+      ...
     ]
 }
 ```
@@ -1235,7 +1317,7 @@ recordId:"15887760531851368911"
 
 ## 笔经干货篇
 
-### 获取标签列表
+### 获取标签列表✅
 
 用于标签筛选
 
@@ -1268,7 +1350,7 @@ openid: on62f4kYUBt-AvuY11BcNNsCE4Ko
 }
 ```
 
-### 获取文章列表
+### 获取文章列表✅
 
 ```http
 GET /writester/experience/articlelist
@@ -1278,8 +1360,8 @@ GET /writester/experience/articlelist
 
 ```json
 openid: on62f4kYUBt-AvuY11BcNNsCE4Ko
-tagId:1  // 
-search:"搜索关键字"
+tagId:1  // 可不传，显示推荐列表
+search:"搜索关键字" // 可为空，可不传
 
 page: 0 //从第0页开始，该字段可不传，服务器端默认为第0页
 size: 10 //每页所含条目大小，该字段可不传，服务器端默认size为10
@@ -1293,22 +1375,28 @@ size: 10 //每页所含条目大小，该字段可不传，服务器端默认siz
     "msg": "成功",
     "data": [
         {
-            "articleId":"123457",
-          	"title":"笔经干货1",
-          	"tag":"互联网",
-          	"type":1, // 1笔经2网申
-          	"readNum": 5000,
-          	"author":"liuyubobobo",
-          	"iconUrl":"http://..."
+            "articleId": "15881323384921812392",
+            "isRecommended": 1,
+            "author": "逍遥子",
+            "tag": "互联网",
+            "iconUrl": "https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=3211174755,200170773&fm=26&gp=0.jpg",
+            "title": "阿里巴巴笔经干货",
+            "readNum": 5000
         },
         {
-					...
-        },
+            "articleId": "15887356685231820333",
+            "isRecommended": 0,
+            "author": "马云",
+            "tag": "互联网",
+            "iconUrl": "https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=3211174755,200170773&fm=26&gp=0.jpg",
+            "title": "阿里巴巴笔经干货2",
+            "readNum": 5000
+        }
     ]
 }
 ```
 
-### 获取文章内容
+### 获取文章内容✅
 
 ```http
 GET /writester/experience/articlecontent
@@ -1327,17 +1415,17 @@ articleId: 123457
 {
     "code": 0,
     "msg": "成功",
-    "data": 
-       {
-            "articleId":"123457",
-          	"title":"笔经干货1",
-          	"tag":"互联网",
-          	"author":"liuyubobobo",
-         		"collectState":0,
-            "readerNum": 5000,
-         		"relaseTime":"2020-04-21",
-         		"content":"Article-content格式，略"
-        }
+    "data": {
+        "articleId": "15881323384921812392",
+        "isRecommended": 1,
+        "author": "逍遥子",
+        "collectState": 0,
+        "content": "阿巴阿巴阿巴巴",
+        "relaseTime": "2020-05-24",
+        "title": "阿里巴巴笔经干货",
+        "tag": "互联网",
+        "readNum": 5000
+    }
 }
 ```
 

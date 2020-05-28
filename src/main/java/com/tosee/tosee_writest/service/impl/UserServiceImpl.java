@@ -60,7 +60,15 @@ public class UserServiceImpl implements UserService
     public UserDTO getUserInfo(String openid)
     {
         User user = userRepository.findByOpenid(openid);
-        UserDTO result = User2UserDTOConverter.convert(user);
+        UserDTO result = null;
+        if (user == null)
+        {
+            log.info("【获取用户信息】该用户不存在");
+        }
+        else
+        {
+            result = User2UserDTOConverter.convert(user);
+        }
 
         return result;
     }

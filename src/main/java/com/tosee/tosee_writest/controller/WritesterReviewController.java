@@ -7,10 +7,7 @@ import com.tosee.tosee_writest.dto.PracticeRecordDTO;
 import com.tosee.tosee_writest.dto.QuestionDTO;
 import com.tosee.tosee_writest.enums.*;
 import com.tosee.tosee_writest.exception.WritestException;
-import com.tosee.tosee_writest.service.FavoriteService;
-import com.tosee.tosee_writest.service.MistakeBookService;
-import com.tosee.tosee_writest.service.PracticeRecordService;
-import com.tosee.tosee_writest.service.QuestionBankService;
+import com.tosee.tosee_writest.service.*;
 import com.tosee.tosee_writest.utils.ResultVOUtil;
 import com.tosee.tosee_writest.vo.*;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +38,9 @@ public class WritesterReviewController
 
     @Autowired
     private FavoriteService favoriteService;
+
+    @Autowired
+    private ExperienceArticleService experienceArticleService;
 
     @Autowired
     private PracticeRecordService practiceRecordService;
@@ -292,7 +292,32 @@ public class WritesterReviewController
             return ResultVOUtil.success(result);
         }
         // 笔经干货
-        else return ResultVOUtil.success("笔经干货收藏列表未完成");
+        else
+        {
+            List<Favorite> favorites = favoriteService.findByOpenidAndFavoriteType(openid,type);
+
+            List<String> favArticleIds = new ArrayList<>();
+            for (Favorite favorite : favorites)
+            {
+                favArticleIds.add(favorite.getTargetId());
+            }
+
+
+            List<ExperienceArticle> articleList = experienceArticleService.findArticlesByIds(favArticleIds);
+
+            List<ArticleVO4List> result = new ArrayList<>();
+
+            for (ExperienceArticle experienceArticle : articleList)
+            {
+                ArticleVO4List articleVO4List = new ArticleVO4List();
+                BeanUtils.copyProperties(experienceArticle,articleVO4List);
+
+                result.add(articleVO4List);
+            }
+
+            log.info("【收藏文章列表】{}",result);
+            return ResultVOUtil.success(result);
+        }
 
     }
 

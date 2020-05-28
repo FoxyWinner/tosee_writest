@@ -14,10 +14,10 @@ public class ParentQuestionBankForm
     @NotNull(message = "题库类型必选")
     private Integer pqbType;
 
-    @NotNull(message = "行业必选")
+//    @NotNull(message = "行业必选")
     private Integer fieldType;
 
-    @NotNull(message = "岗位必选")
+//    @NotNull(message = "岗位必选")
     private Integer positionType;
 
     private Integer companyId;
@@ -32,6 +32,8 @@ public class ParentQuestionBankForm
     private String relaseTime;
 
     private Boolean isRecommended = false;
+
+    private Boolean isRelase = false;
 
     // 发布日期，默认显示当前
 

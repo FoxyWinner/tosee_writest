@@ -96,6 +96,8 @@ public class WeChatController
             throw new WritestException(ResultEnum.PARAM_ERROR.getCode(),bindingResult.getFieldError().getDefaultMessage());
         }
 
+        userInfoForm.setAuthorised(1);
+
         UserDTO userDTO = new UserDTO();
         BeanUtils.copyProperties(userInfoForm,userDTO);
 
@@ -114,8 +116,10 @@ public class WeChatController
             throw new WritestException(ResultEnum.PARAM_ERROR.getCode(),ResultEnum.PARAM_ERROR.getMessage());
         }
 
-        UserDTO userDTO = new UserDTO();
+        UserDTO userDTO;
         userDTO = userService.getUserInfo(openid);
+        if (userDTO  == null)
+            return ResultVOUtil.error(ResultEnum.USERINFO_NOT_EXIST.getCode(),ResultEnum.USERINFO_NOT_EXIST.getMessage());
 
         MiniUserInfoVO userInfoVO = this.convertUserDTO2MiniUserVO(userDTO);
 
@@ -131,8 +135,11 @@ public class WeChatController
             throw new WritestException(ResultEnum.PARAM_ERROR.getCode(),ResultEnum.PARAM_ERROR.getMessage());
         }
 
-        UserDTO userDTO = new UserDTO();
+        UserDTO userDTO;
         userDTO = userService.getUserInfo(openid);
+
+        if (userDTO  == null)
+            return ResultVOUtil.error(ResultEnum.USERINFO_NOT_EXIST.getCode(),ResultEnum.USERINFO_NOT_EXIST.getMessage());
 
         UserVO userVO = this.convertUserDTO2UserVO(userDTO);
 

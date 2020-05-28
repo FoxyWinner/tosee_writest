@@ -1,6 +1,7 @@
 package com.tosee.tosee_writest.service;
 
 import com.tosee.tosee_writest.dataobject.*;
+import com.tosee.tosee_writest.dto.ChildQuestionBankDTO;
 import com.tosee.tosee_writest.dto.ParentQuestionBankDTO;
 import com.tosee.tosee_writest.dto.QuestionDTO;
 import com.tosee.tosee_writest.enums.QuestionBankSortEnum;
@@ -64,6 +65,8 @@ public interface QuestionBankService
 
      String getCQbTitle(String childQbId);
 
+     String getPQBTitle(String parentQbId);
+
      /** 为某套子题库热度++，顺便重新计算父题库热度*/
      void increaseChildQuestionBankHeat(String childQbId);
 
@@ -73,12 +76,23 @@ public interface QuestionBankService
     // 以下为运营用
 
     /** 获取父题库列表 */
-    Page<ParentQuestionBankDTO> findPQBList(Pageable pageable);
+    /**
+     * 对于管理员来说，哪怕是没有发布我也要呈现
+     * @param pageable
+     * @return
+     */
+    Page<ParentQuestionBankDTO> findPQBList4Admin(Pageable pageable);
+
+
+    void relaseParentQuestionBank(ParentQuestionBank parentQuestionBank);
+
+    void cancelParentQuestionBank(ParentQuestionBank parentQuestionBank);
+
 
     /** 获取子题库列表 */
-    Page<ChildQuestionBank> findCQBList(Pageable pageable);
+    Page<ChildQuestionBankDTO> findCQBList(Pageable pageable);
 
-    Page<ChildQuestionBank> findCQBList(Pageable pageable,String pqbId);
+    Page<ChildQuestionBankDTO> findCQBList(Pageable pageable,String pqbId);
 
     List<ChildQuestionBank> findAllCQBs();
 

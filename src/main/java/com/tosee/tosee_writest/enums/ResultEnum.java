@@ -9,6 +9,9 @@ public enum ResultEnum
 
     PARAM_ERROR(1, "参数不正确"),
 
+
+    PQB_NOT_EXIST(10,"主题库不存在"),
+
     COMPANY_NOT_EXIST(11,"公司不存在"),
 
     OPTIONS_NOT_EXIST(21,"题目的选项不存在"),
@@ -31,6 +34,11 @@ public enum ResultEnum
     WECHAT_MA_EMPTY_JSCODE(30, "JSCODE为空"),
 
     WECHAT_MA_ERROR(31,"微信小程序端相关错误"),
+
+    USERINFO_NOT_EXIST(32,"查询不到该用户信息"),
+
+    ARTICLE_NOT_EXIST(33,"查询文章失败"),
+
 
     EXCEED_AUTHORITY(40,"横向越权错误"),
 

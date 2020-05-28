@@ -1,0 +1,36 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+    url: jdbc:mysql://localhost/tosee_writest?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+  jpa:
+    show-sql: true
+  jackson:
+    default-property-inclusion: non_null
+
+
+#  redis:
+#    #默认其实就是这个
+#    host: 127.0.0.1
+#    port: 6379
+
+wechat:
+  miniapp:
+    appid: wx7997b94e51ddc47e
+    secret: 1b453be26d6794509ff3eae495e0c089
+#    mchId: 1534773561
+#    mchKey: 3d955afdf7892e3113240dcd79a040d6
+    keyPath: /Users/foxywinner/cert
+    notifyUrl: https://fubaionline.mynatapp.cc/onlinestore/pay/notify #正式上线需改
+    msgDataFormat: JSON
+    openAppId: wxe52fcab96b371e3f
+    openAppSecret: b5e87b668f795edb852769cdfc1165cc
+
+projectUrl:
+  wechatMpAuthorize: https://toseewritest.mynatapp.cc
+  wechatOpenAuthorize: https://toseewritest.mynatapp.cc
+  toseewritest: https://toseewritest.mynatapp.cc
+server:
+  servlet:
+    context-path: /toseewritest  #prefix

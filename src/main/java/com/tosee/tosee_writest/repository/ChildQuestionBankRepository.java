@@ -13,6 +13,7 @@ import java.util.List;
  */
 public interface ChildQuestionBankRepository extends JpaRepository<ChildQuestionBank, String>
 {
+
     List<ChildQuestionBank> findByParentQbIdOrderByCqbHeatDesc(String parentQbId);
 
     List<ChildQuestionBank> findByParentQbIdOrderByRelaseTimeDesc(String parentQbId);
@@ -20,4 +21,6 @@ public interface ChildQuestionBankRepository extends JpaRepository<ChildQuestion
     List<ChildQuestionBank> findByIsRecommendedOrderByCqbHeatDesc(Integer isRecommended);
 
     Page<ChildQuestionBank> findByParentQbIdOrderByRelaseTime(Pageable pageable , String parentQbId);
+
+    Integer countByParentQbId(String parentQbId);
 }

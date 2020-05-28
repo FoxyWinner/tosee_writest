@@ -290,13 +290,15 @@ create table `experience_article`(
   /* 文章信息 */
   `article_type` tinyint(3) default 0 COMMENT '文章类别,0普通，预留字段',
   
-  `article_tag_id` varchar(64) comment '文章标签,id列表',
+  `article_tag_id` int comment '文章标签id',
   
   `article_icon` varchar(128) comment '文章iconurl',
   
   `reader_number` int default 0 not null comment '多少人读过，“热点”时的排序依据',
   
   `author` varchar(32) comment '作者名',
+  
+  `relase_time` varchar(64) comment '发布时间',
   
   /* 文章内容 */
   

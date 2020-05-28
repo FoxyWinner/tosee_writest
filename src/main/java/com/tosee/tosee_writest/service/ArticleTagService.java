@@ -11,4 +11,6 @@ import java.util.List;
 public interface ArticleTagService
 {
     List<ArticleTag> findTagList();
+
+    String getTagName(Integer tagId);
 }

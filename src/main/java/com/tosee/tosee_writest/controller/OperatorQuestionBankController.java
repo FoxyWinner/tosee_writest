@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.tosee.tosee_writest.dataobject.*;
+import com.tosee.tosee_writest.dto.ChildQuestionBankDTO;
 import com.tosee.tosee_writest.dto.ParentQuestionBankDTO;
 import com.tosee.tosee_writest.dto.QuestionDTO;
 import com.tosee.tosee_writest.enums.ParentQuestionBankTypeEnum;
@@ -66,7 +67,7 @@ public class OperatorQuestionBankController
     {
         log.info("【运营父题库列表】进入该请求");
         PageRequest request = PageRequest.of(page - 1, size);
-        Page<ParentQuestionBankDTO> parentQuestionBankDTOPage = questionBankService.findPQBList(request);
+        Page<ParentQuestionBankDTO> parentQuestionBankDTOPage = questionBankService.findPQBList4Admin(request);
         map.put("parentQuestionBankDTOPage", parentQuestionBankDTOPage);
 
         map.put("currentPage", page);
@@ -151,6 +152,46 @@ public class OperatorQuestionBankController
         return new ModelAndView("common/success", map);
     }
 
+    @GetMapping("/pqbrelase")
+    public ModelAndView pqbRelase(@RequestParam (value = "parentQbId" , required = true) String parentQbId,
+                                Map<String, Object> map)
+    {
+
+        ParentQuestionBank parentQuestionBank  = questionBankService.findOneParentQuestionBank(parentQbId);
+        try
+        {
+            questionBankService.relaseParentQuestionBank(parentQuestionBank);
+        } catch (WritestException e)
+        {
+            map.put("msg", e.getMessage());
+            map.put("url", "/toseewritest/operator/questionbank/pqblist");
+            return new ModelAndView("common/error", map);
+        }
+
+        map.put("url", "/toseewritest/operator/questionbank/pqblist");
+        return new ModelAndView("common/success", map);
+    }
+
+    @GetMapping("/pqbcancelrelase")
+    public ModelAndView pqbCancelRelase(@RequestParam (value = "parentQbId" , required = true) String parentQbId,
+                                  Map<String, Object> map)
+    {
+
+        ParentQuestionBank parentQuestionBank  = questionBankService.findOneParentQuestionBank(parentQbId);
+        try
+        {
+            questionBankService.cancelParentQuestionBank(parentQuestionBank);
+        } catch (WritestException e)
+        {
+            map.put("msg", e.getMessage());
+            map.put("url", "/toseewritest/operator/questionbank/pqblist");
+            return new ModelAndView("common/error", map);
+        }
+
+        map.put("url", "/toseewritest/operator/questionbank/pqblist");
+        return new ModelAndView("common/success", map);
+    }
+
     @GetMapping("/cqblist")
     public ModelAndView cqbList(@RequestParam (value = "parentQbId" , required = false) String parentQbId,
                                 @RequestParam(value = "page", defaultValue = "1") Integer page,
@@ -159,7 +200,7 @@ public class OperatorQuestionBankController
     {
         log.info("【运营子题库列表】{}",parentQbId);
         PageRequest request = PageRequest.of(page - 1, size);
-        Page<ChildQuestionBank> childQuestionBankPage;
+        Page<ChildQuestionBankDTO> childQuestionBankPage;
 
         if(StringUtils.isEmpty(parentQbId))
             childQuestionBankPage = questionBankService.findCQBList(request);
@@ -214,19 +255,13 @@ public class OperatorQuestionBankController
                 childQuestionBank.setQuestionNumber(0);
             }
             BeanUtils.copyProperties(form, childQuestionBank);
-
-            if(form.getIsRecommended())
-            {
-                log.info("【子题库被推荐】");
-                childQuestionBank.setIsRecommended(1);
-            }
+            if (form.getIsRecommended()) childQuestionBank.setIsRecommended(1);
             else childQuestionBank.setIsRecommended(0);
 
 
             log.info("【子题库保存】{}",childQuestionBank);
             questionBankService.saveChildQuestionBank(childQuestionBank);
 
-            questionBankService.updateParentQuestionBankHeat(childQuestionBank.getParentQbId());
         } catch (WritestException e)
         {
             map.put("msg", e.getMessage());
@@ -252,6 +287,8 @@ public class OperatorQuestionBankController
             questionDTOPage = questionBankService.findQuestionsDTOList(request);
         else
             questionDTOPage = questionBankService.findQuestionsDTOList(request,childQbId);
+
+        map.put("currentchildQbId",childQbId);
 
         map.put("questionDTOPage", questionDTOPage);
         map.put("currentPage", page);

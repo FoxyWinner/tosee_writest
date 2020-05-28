@@ -29,11 +29,7 @@ class ParentQuestionBankRepositoryTest
     @Test
     @Transactional
     public void findByTargetPositionTypeAndPqbTypeOrderByPqbHeatDesc(){
-        //
-//        List<ParentQuestionBank> questionBanks = repository.findByPositionTypeAndPqbTypeOrderByPqbHeatDesc(3, ParentQuestionBankTypeEnum.ENTERPRISE_BANK.getCode());
-        List<ParentQuestionBank> questionBanks = repository.findByPositionTypeAndPqbTypeOrderByRelaseTimeDesc(3, ParentQuestionBankTypeEnum.ENTERPRISE_BANK.getCode());
 
-        System.out.println(questionBanks.toString());
     }
 
 }

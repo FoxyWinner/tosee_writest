@@ -12,8 +12,8 @@ public enum UserEduDegreeEnum implements CodeEnum
     DOMESTIC_UNDERGRADUATE(1,"国内本科"),
     OVERSEAS_UNDERGRADUATE(2,"海外本科"),
     MASTER_DEGREE_CANDIDATE(3,"硕士研究生"),
-    DOCTORAL_CANDIDATE(3,"博士研究生"),
-    ELSE(4,"其他"),
+    DOCTORAL_CANDIDATE(4,"博士研究生"),
+    ELSE(5,"其他"),
             ;
 
     private Integer code;

@@ -1,5 +1,8 @@
 package com.tosee.tosee_writest.dataobject;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.tosee.tosee_writest.enums.PositionPQBTypeEnum;
+import com.tosee.tosee_writest.utils.EnumUtil;
 import lombok.Data;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -17,6 +20,9 @@ public class WorkPosition
     @GeneratedValue
     private Integer positionId;
 
+    // 20200526重构该岗位属于特定的类型！
+    private Integer pqbType;
+
     /** 所属行业编号. */
     private Integer fieldType;
 
@@ -25,4 +31,10 @@ public class WorkPosition
 
     /** 职位名称. */
     private String positionName;
+
+    @JsonIgnore
+    public String getPqbTypeName()
+    {
+        return EnumUtil.getByCode(pqbType, PositionPQBTypeEnum.class).getMessage();
+    }
 }

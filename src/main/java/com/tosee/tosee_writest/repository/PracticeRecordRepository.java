@@ -16,5 +16,5 @@ public interface PracticeRecordRepository extends JpaRepository<PracticeRecord, 
     PracticeRecord findByOpenIdAndAndChildQbId(String openid, String childQbId);
 
     // 练习记录界面
-    List<PracticeRecord> findByOpenId(String openid);
+    List<PracticeRecord> findByOpenIdOrderByUpdateTimeDesc(String openid);
 }

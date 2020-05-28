@@ -137,7 +137,7 @@ public class WritesterQuestionBankController
         List<ParentQuestionBank> parentQuestionBanks = questionBankService.findPQBListByPositionTypeAndPqbTypeOrderBy(positionType,ParentQuestionBankTypeEnum.PROFESSIONAL_BANK.getCode(),QuestionBankSortEnum.SORT_BY_HEAT_DESC);
         if(parentQuestionBanks.size() != 1)
         {
-            log.error("【查专业知识子题库列表】未上传该专业知识题库");
+            log.error("【查专业知识子题库列表】未上传该专业知识题库，positionType为{}",positionType);
             return ResultVOUtil.success(result);
         }
         parentQuestionBank = parentQuestionBanks.get(0);
@@ -346,9 +346,7 @@ public class WritesterQuestionBankController
             log.error("【查询作答报告】cqbId为空");
             throw new WritestException(ResultEnum.PARAM_ERROR);
         }
-        // 我发现不需要在数据库里存储answerList，用户需要报告的时候现查就是了
-//         correctRatio; spentTime; completeNumber; questionNumber;surpassRatio;answerList; userAnswerList;
-        // todo 一定要给数据库加questionSeq 而且查询list的时候按题号升序
+
         ReportVO reportVO = new ReportVO();
 
         PracticeRecordDTO practiceRecordDTO = practiceRecordService.findRecord(openid,cqbId);
@@ -385,14 +383,29 @@ public class WritesterQuestionBankController
 
         PracticeRecordDTO practiceRecordDTO = RecordForm2PracticeRecordDTOConverter.convert(recordForm);
 
+        log.info("【创建记录】recordForm{}",recordForm);
+
+        Map<String, Integer> result = new HashMap<>();
+
         // 前端需求 完成时lastMode要为0 , 估计后期还得改回来
         if(practiceRecordDTO.getComplete() == RecordStateEnum.COMPLETED.getCode())
+        {
             practiceRecordDTO.setLastMode(RecordLastModeEnum.UNKOWN_MODE.getCode());
+
+            // todo  现在是根据用户的正确率来映射的假超越率
+            practiceRecordDTO.setSurpassRatio(this.surpassRatioFromCorrect(practiceRecordDTO.getCorrectRatio()));
+            log.info("正确率{}",practiceRecordDTO.getCorrectRatio());
+            log.info("超越率{}",practiceRecordDTO.getSurpassRatio());
+
+
+            result.put("surpassRatio",practiceRecordDTO.getSurpassRatio());
+        }
 
         // 因为form里没有title，而前端想在做题报告中获取title，所以单独给practiceRecordDTO填入这一字段
         practiceRecordDTO.setChildQbTitle(questionBankService.getCQbTitle(recordForm.getCqbId()));
 
         log.info("【创建记录】子题库标题为{}",practiceRecordDTO.getChildQbTitle());
+
 
         practiceRecordService.addOrUpdateRecord(practiceRecordDTO);
 
@@ -423,11 +436,8 @@ public class WritesterQuestionBankController
             mistakeBookService.addMistake(wrongQuestionIds,mistakeBook);
         }
 
-        Map<String, Integer> map = new HashMap<>();
-        // todo 现在surpassRatio是空的，我想要上面addOrUpdateRecord返回surpassRatio
-//        map.put("surpassRatio",practiceRecordDTO.getSurpassRatio());
-        map.put("surpassRatio",100);
-        return ResultVOUtil.success(map);
+
+        return ResultVOUtil.success(result);
     }
 
 
@@ -465,6 +475,46 @@ public class WritesterQuestionBankController
             childQuestionBankVOS.add(childQuestionBankVO);
         }
         return childQuestionBankVOS;
+    }
+
+
+    /**先暂时用的假超越率
+     * 打败用户率：
+     * 如果用户做题正确率为70—100%，就在80%-95%中随机选一个值作为打败用户率；
+     * 如果用户做题正确率为50—70%，就在60%-80%中随机选一个值作为打败用户率；
+     * 如果用户做题正确率为20—50%，就在30%-60%中随机选一个值作为打败用户率；
+     * 如果用户做题正确率为1—20%，就在1%-30%中随机选一个值作为打败用户率；
+     * 用户做题正确率为0%，打败用户率为0%；
+     * @param correct
+     * @return
+     */
+    public Integer surpassRatioFromCorrect(Integer correct)
+    {
+        Integer surpassRatio;
+        if (correct > 70 && correct<=100 )
+        {
+            surpassRatio = this.randomGenerate(80,95);// 80-95随机
+        }
+        else if(correct>50 && correct <= 70)
+        {
+            surpassRatio = this.randomGenerate(60,80);// 60-80
+        }
+        else if (correct>20 && correct<= 50)
+        {
+            surpassRatio = this.randomGenerate(30,60);//30-60
+        }
+        else if (correct>1 && correct <= 20)
+        {
+            surpassRatio = this.randomGenerate(1,30); //1-30
+        }
+        else surpassRatio = 0;
+        return surpassRatio;
+    }
+
+    public Integer randomGenerate(Integer min, Integer max)
+    {
+        Integer randomInt = (int) (Math.random()*(max-min)+min);
+        return randomInt;
     }
 
 

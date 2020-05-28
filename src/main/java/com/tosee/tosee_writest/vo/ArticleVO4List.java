@@ -1,5 +1,6 @@
-package com.tosee.tosee_writest.dataobject;
+package com.tosee.tosee_writest.vo;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -11,37 +12,25 @@ import java.util.Date;
  * @Author: FoxyWinner
  * @Date: 2020/5/21 10:50 下午
  */
-@Entity
-@DynamicUpdate
 @Data
-public class ExperienceArticle
+public class ArticleVO4List
 {
-    @Id
     private String articleId;
 
     private Integer isRecommended;
 
-    // 预留字段，暂时用不着
-    private Integer articleType;
-
-    private Integer articleTagId;
-
+    @JsonProperty("secondTag")
     private String secondTag;
 
+
+    @JsonProperty("iconUrl")
     private String articleIcon;
 
+    @JsonProperty("title")
     private String articleTitle;
 
+    @JsonProperty("readNum")
     private Integer readerNumber;
 
     private String author;
-
-    private String content;
-
-    private Date relaseTime;
-
-    private Date createTime;
-
-    private Date updateTime;
-
 }

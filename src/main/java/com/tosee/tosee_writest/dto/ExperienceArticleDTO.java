@@ -1,4 +1,4 @@
-package com.tosee.tosee_writest.dataobject;
+package com.tosee.tosee_writest.dto;
 
 import lombok.Data;
 import org.hibernate.annotations.DynamicUpdate;
@@ -11,12 +11,9 @@ import java.util.Date;
  * @Author: FoxyWinner
  * @Date: 2020/5/21 10:50 下午
  */
-@Entity
-@DynamicUpdate
 @Data
-public class ExperienceArticle
+public class ExperienceArticleDTO
 {
-    @Id
     private String articleId;
 
     private Integer isRecommended;
@@ -25,6 +22,8 @@ public class ExperienceArticle
     private Integer articleType;
 
     private Integer articleTagId;
+
+    private String articleTagName;
 
     private String secondTag;
 
@@ -38,10 +37,5 @@ public class ExperienceArticle
 
     private String content;
 
-    private Date relaseTime;
-
-    private Date createTime;
-
-    private Date updateTime;
-
+    private String relaseTime;
 }

@@ -1,8 +1,8 @@
 package com.tosee.tosee_writest.service.impl;
-
 import com.tosee.tosee_writest.converter.ParentQB2ParentQBDTOConverter;
 import com.tosee.tosee_writest.converter.Question2QuestionDTOConverter;
 import com.tosee.tosee_writest.dataobject.*;
+import com.tosee.tosee_writest.dto.ChildQuestionBankDTO;
 import com.tosee.tosee_writest.dto.ParentQuestionBankDTO;
 import com.tosee.tosee_writest.dto.QuestionDTO;
 import com.tosee.tosee_writest.enums.ParentQuestionBankTypeEnum;
@@ -62,9 +62,10 @@ public class QuestionBankServiceImpl implements QuestionBankService
         // 按热度排序
         if(sortRule == QuestionBankSortEnum.SORT_BY_HEAT_DESC)
         {
-            return parentQuestionBankRepository.findByPositionTypeAndPqbTypeOrderByPqbHeatDesc(positionType,pqbType);
+            return parentQuestionBankRepository.findByPositionTypeAndPqbTypeAndIsRelaseOrderByPqbHeatDesc(positionType,pqbType,1);
+
         }
-        else return parentQuestionBankRepository.findByPositionTypeAndPqbTypeOrderByRelaseTimeDesc(positionType,pqbType);
+        else return parentQuestionBankRepository.findByPositionTypeAndPqbTypeAndIsRelaseOrderByRelaseTimeDesc(positionType,pqbType,1);
     }
 
     @Override
@@ -73,9 +74,9 @@ public class QuestionBankServiceImpl implements QuestionBankService
         // 按热度排序
         if(sortRule == QuestionBankSortEnum.SORT_BY_HEAT_DESC)
         {
-            return parentQuestionBankRepository.findByPositionTypeInAndPqbTypeOrderByPqbHeatDesc(positionTypes,ParentQuestionBankTypeEnum.ENTERPRISE_BANK.getCode());
+            return parentQuestionBankRepository.findByPositionTypeInAndPqbTypeAndIsRelaseOrderByPqbHeatDesc(positionTypes,ParentQuestionBankTypeEnum.ENTERPRISE_BANK.getCode(),1);
         }
-        else return parentQuestionBankRepository.findByPositionTypeInAndPqbTypeOrderByRelaseTimeDesc(positionTypes,ParentQuestionBankTypeEnum.ENTERPRISE_BANK.getCode());
+        else return parentQuestionBankRepository.findByPositionTypeInAndPqbTypeAndIsRelaseOrderByRelaseTimeDesc(positionTypes,ParentQuestionBankTypeEnum.ENTERPRISE_BANK.getCode(),1);
     }
 
     @Override
@@ -83,15 +84,15 @@ public class QuestionBankServiceImpl implements QuestionBankService
     {
         if(sortRule == QuestionBankSortEnum.SORT_BY_HEAT_DESC)
         {
-            return parentQuestionBankRepository.findByIsRecommendedAndPqbTypeOrderByPqbHeatDesc(1,ParentQuestionBankTypeEnum.ENTERPRISE_BANK.getCode());
+            return parentQuestionBankRepository.findByIsRecommendedAndPqbTypeAndIsRelaseOrderByPqbHeatDesc(1,ParentQuestionBankTypeEnum.ENTERPRISE_BANK.getCode(),1);
         }
-        else return parentQuestionBankRepository.findByIsRecommendedAndPqbTypeOrderByRelaseTimeDesc(1,ParentQuestionBankTypeEnum.ENTERPRISE_BANK.getCode());
+        else return parentQuestionBankRepository.findByIsRecommendedAndPqbTypeAndIsRelaseOrderByRelaseTimeDesc(1,ParentQuestionBankTypeEnum.ENTERPRISE_BANK.getCode(),1);
     }
 
     @Override
     public List<ParentQuestionBank> findAdministraPqb()
     {
-        return parentQuestionBankRepository.findByPqbTypeOrderByPqbHeat(ParentQuestionBankTypeEnum.ADMINISTRATIVE_APTITUDE_BANK.getCode());
+        return parentQuestionBankRepository.findByPqbTypeAndIsRelaseOrderByPqbHeat(ParentQuestionBankTypeEnum.ADMINISTRATIVE_APTITUDE_BANK.getCode(),1);
     }
 
     @Override
@@ -221,6 +222,14 @@ public class QuestionBankServiceImpl implements QuestionBankService
         else  return "";
     }
 
+    @Override
+    public String getPQBTitle(String parentQbId)
+    {
+        ParentQuestionBank parentQuestionBank = parentQuestionBankRepository.findById(parentQbId).orElse(null);
+        if (parentQuestionBank != null) return parentQuestionBank.getPqbTitle();
+        else return "";
+    }
+
     //todo 这个方法感觉异步调用就可以
     @Override
     public void increaseChildQuestionBankHeat(String childQbId)
@@ -243,21 +252,28 @@ public class QuestionBankServiceImpl implements QuestionBankService
     {
         // 重新计算父题库热度
         ParentQuestionBank parentQuestionBank = parentQuestionBankRepository.findById(parentQbId).orElse(null);
+        log.info("【重算热度】主题库{}",parentQuestionBank);
         if(parentQuestionBank!=null)
         {
             Integer parentHeat = 0;
             List<ChildQuestionBank> childQuestionBanks = childQuestionBankRepository.findByParentQbIdOrderByCqbHeatDesc(parentQuestionBank.getParentQbId());
-            for (ChildQuestionBank hisChildren : childQuestionBanks)
+
+            if (childQuestionBanks.size() > 0)
             {
-                parentHeat += hisChildren.getCqbHeat();
+                for (ChildQuestionBank hisChildren : childQuestionBanks)
+                {
+                    parentHeat += hisChildren.getCqbHeat();
+                }
             }
+
             parentQuestionBank.setPqbHeat(parentHeat);
+            log.info("【重算热度】{}",parentQuestionBank);
             parentQuestionBankRepository.save(parentQuestionBank);
         }
     }
 
     @Override
-    public Page<ParentQuestionBankDTO> findPQBList(Pageable pageable)
+    public Page<ParentQuestionBankDTO> findPQBList4Admin(Pageable pageable)
     {
         Page<ParentQuestionBank> parentQuestionBankPage =  parentQuestionBankRepository.findAll(pageable);
 
@@ -287,19 +303,61 @@ public class QuestionBankServiceImpl implements QuestionBankService
     }
 
     @Override
-    public Page<ChildQuestionBank> findCQBList(Pageable pageable)
+    public void relaseParentQuestionBank(ParentQuestionBank parentQuestionBank)
     {
-        Page<ChildQuestionBank> childQuestionBankPage =  childQuestionBankRepository.findAll(pageable);
-
-        return childQuestionBankPage;
+        if (parentQuestionBank == null)
+        {
+            throw new WritestException(ResultEnum.PQB_NOT_EXIST);
+        }
+        parentQuestionBank.setIsRelase(1);
+        parentQuestionBankRepository.save(parentQuestionBank);
     }
 
     @Override
-    public Page<ChildQuestionBank> findCQBList(Pageable pageable, String pqbId)
+    public void cancelParentQuestionBank(ParentQuestionBank parentQuestionBank)
+    {
+        if (parentQuestionBank == null)
+        {
+            throw new WritestException(ResultEnum.PQB_NOT_EXIST);
+        }
+
+        parentQuestionBank.setIsRelase(0);
+        parentQuestionBankRepository.save(parentQuestionBank);
+    }
+
+    @Override
+    public Page<ChildQuestionBankDTO> findCQBList(Pageable pageable)
+    {
+        Page<ChildQuestionBank> childQuestionBankPage =  childQuestionBankRepository.findAll(pageable);
+
+        List<ChildQuestionBankDTO> childQuestionBankDTOS = new ArrayList<>();
+        for (ChildQuestionBank childQuestionBank : childQuestionBankPage.getContent())
+        {
+            ChildQuestionBankDTO childQuestionBankDTO = new ChildQuestionBankDTO();
+            BeanUtils.copyProperties(childQuestionBank,childQuestionBankDTO);
+            childQuestionBankDTO.setParentQbTitle(this.getPQBTitle(childQuestionBankDTO.getParentQbId()));
+
+            childQuestionBankDTOS.add(childQuestionBankDTO);
+        }
+        return new PageImpl<>(childQuestionBankDTOS, pageable,childQuestionBankPage.getTotalElements());
+    }
+
+    @Override
+    public Page<ChildQuestionBankDTO> findCQBList(Pageable pageable, String pqbId)
     {
         Page<ChildQuestionBank> childQuestionBankPage =  childQuestionBankRepository.findByParentQbIdOrderByRelaseTime(pageable,pqbId);
 
-        return childQuestionBankPage;
+
+        List<ChildQuestionBankDTO> childQuestionBankDTOS = new ArrayList<>();
+        for (ChildQuestionBank childQuestionBank : childQuestionBankPage.getContent())
+        {
+            ChildQuestionBankDTO childQuestionBankDTO = new ChildQuestionBankDTO();
+            BeanUtils.copyProperties(childQuestionBank,childQuestionBankDTO);
+            childQuestionBankDTO.setParentQbTitle(this.getPQBTitle(childQuestionBankDTO.getParentQbId()));
+
+            childQuestionBankDTOS.add(childQuestionBankDTO);
+        }
+        return new PageImpl<>(childQuestionBankDTOS, pageable,childQuestionBankPage.getTotalElements());
     }
 
     @Override
@@ -311,10 +369,10 @@ public class QuestionBankServiceImpl implements QuestionBankService
     @Override
     public Page<QuestionDTO> findQuestionsDTOList(Pageable pageable)
     {
-        List<Question> questions = questionRepository.findAll();
+        Page<Question> questionPage = questionRepository.findAll(pageable);
 
         // 这里把questions转为questionDTOS
-        List<QuestionDTO> questionDTOS = Question2QuestionDTOConverter.convert(questions);
+        List<QuestionDTO> questionDTOS = Question2QuestionDTOConverter.convert(questionPage.getContent());
 
         //为DTOList里每个QuestionDTO填充他的选项List，且填入子题库名
         for (QuestionDTO questionDTO : questionDTOS)
@@ -335,14 +393,36 @@ public class QuestionBankServiceImpl implements QuestionBankService
             }
         }
 
-        return new PageImpl<>(questionDTOS, pageable,questionDTOS.size());
+        return new PageImpl<>(questionDTOS, pageable,questionPage.getTotalElements());
     }
 
     @Override
     public Page<QuestionDTO> findQuestionsDTOList(Pageable pageable, String cqbId)
     {
-        List<QuestionDTO> questionDTOS = this.findQuestionListByCQBId(cqbId);
-        return new PageImpl<>(questionDTOS, pageable,questionDTOS.size());
+        Page<Question> questionPage = questionRepository.findByChildQbIdOrderByQuestionSeqAsc(cqbId,pageable);
+        // 这里把questions转为questionDTOS
+        List<QuestionDTO> questionDTOS = Question2QuestionDTOConverter.convert(questionPage.getContent());
+
+        //为DTOList里每个QuestionDTO填充他的选项List，且填入子题库名
+        for (QuestionDTO questionDTO : questionDTOS)
+        {
+            ChildQuestionBank childQuestionBank = childQuestionBankRepository.findById(questionDTO.getChildQbId()).orElse(null);
+            if (childQuestionBank !=null)  questionDTO.setChildQbTitle(childQuestionBank.getCqbTitle());
+
+            if(questionDTO.getQuestionType()!= QuestionTypeEnum.ESSAY_QUESTION.getCode())
+            {
+                List<QuestionOption> questionOptions = questionOptionRepository.findByQuestionIdOrderByOptionNameAsc(questionDTO.getQuestionId());
+
+                if(CollectionUtils.isEmpty(questionOptions))
+                {
+                    throw new WritestException(ResultEnum.OPTIONS_NOT_EXIST);
+                }
+
+                questionDTO.setQuestionOptions(questionOptions);
+            }
+        }
+
+        return new PageImpl<>(questionDTOS, pageable,questionPage.getTotalElements());
     }
 
     @Override
@@ -434,11 +514,44 @@ public class QuestionBankServiceImpl implements QuestionBankService
     @Override
     public Question saveQuestionDTO(QuestionDTO questionDTO)
     {
+        // 先给所填答案去空格化
+        questionDTO.setAnswer(questionDTO.getAnswer().trim());
+
         // 若是新增，要将CQB的questionNumber++
         Question question = questionRepository.findById(questionDTO.getQuestionId()).orElse(null);
-        if (question == null) this.increaseChildQuestionBankQuestionNumber(questionDTO.getChildQbId());
+        Question result;
+        if (question == null)
+        {
+            // 要新增
+            BeanUtils.copyProperties(questionDTO,question);
+            result = questionRepository.save(question);
+            // 新增之后子题库题目数量 + 1
+            this.recountChildQuestionBankQuestionNumber(result.getChildQbId());
+        }
+        else
+        {
+            // 若为更改
+            String lastChildQbId = question.getChildQbId();
+            // copy完之后更改后的子题库ID可能已经存入question中
+            BeanUtils.copyProperties(questionDTO,question);
 
-        // 非问答题，存选项
+            result = questionRepository.save(question);
+
+            // 如果这次更改更改了子题库所属，那么前后子题库都要更新计数，题目题号也要重新维护
+            if (!lastChildQbId.equals(question.getChildQbId()))
+            {
+                this.recountChildQuestionBankQuestionNumber(lastChildQbId);
+                this.recountChildQuestionBankQuestionNumber(result.getChildQbId());
+
+                this.resortQuestionSeq(lastChildQbId);
+                this.resortQuestionSeq(result.getChildQbId());
+
+            }
+
+        }
+
+
+        // 无论更改还是新增，非问答题，新存选项，如果以前有则自动覆盖，没有则创建（以ID为基准的）
         if(questionDTO.getQuestionType() != QuestionTypeEnum.ESSAY_QUESTION.getCode())
         {
             if(CollectionUtils.isEmpty(questionDTO.getQuestionOptions()))
@@ -449,24 +562,39 @@ public class QuestionBankServiceImpl implements QuestionBankService
             this.saveQuestionOptions(questionDTO.getQuestionOptions());
         }
 
+
         // 存Question
-        question = new Question();
-        BeanUtils.copyProperties(questionDTO,question);
-        // 答案去空格化处理
-        question.setAnswer(question.getAnswer().trim());
-        return questionRepository.save(question);
+        return result;
     }
 
     @Transactional
     @Override
     public ChildQuestionBank saveChildQuestionBank(ChildQuestionBank childQuestionBank)
     {
-        // 若是新增，要将PQB的questionNumber++
+
         ChildQuestionBank existChildQuestionBank = childQuestionBankRepository.findById(childQuestionBank.getChildQbId()).orElse(null);
-        if (existChildQuestionBank == null) this.increaseParentQuestionBankCQBNum(childQuestionBank.getParentQbId());
+
 
         // 存ChildQuestionBank
-        return childQuestionBankRepository.save(childQuestionBank);
+        ChildQuestionBank result = childQuestionBankRepository.save(childQuestionBank);
+
+        // 新增和修改做出不同的对主题库的热度、子题库数的维护
+        if (existChildQuestionBank == null)
+        {
+            log.info("【新增子题库】更新了计数和热度");
+            this.increaseParentQuestionBankCQBNum(childQuestionBank.getParentQbId());
+            this.updateParentQuestionBankHeat(childQuestionBank.getParentQbId());
+
+        }else
+        {
+            log.info("【修改子题库】更新了计数和热度");
+            this.recountParentQuestionBankCQBNum(existChildQuestionBank.getParentQbId());
+            this.updateParentQuestionBankHeat(existChildQuestionBank.getParentQbId());
+            this.recountParentQuestionBankCQBNum(result.getParentQbId());
+            this.updateParentQuestionBankHeat(result.getParentQbId());
+        }
+
+        return result;
     }
 
     @Transactional
@@ -483,20 +611,10 @@ public class QuestionBankServiceImpl implements QuestionBankService
         }
 
         // 子题库题目数量重数
-        ChildQuestionBank childQuestionBank = this.findCQBById(childQbId);
-        childQuestionBank.setQuestionNumber(this.findQuestionListByCQBId(childQbId).size());
-        childQuestionBankRepository.save(childQuestionBank);
+        this.recountChildQuestionBankQuestionNumber(childQbId);
 
         // 题目序号重排列并保存
-        List<QuestionDTO> questionDTOS = this.findQuestionListByCQBId(childQbId);
-        int i = 0;
-        for (QuestionDTO questionDTO : questionDTOS)
-        {
-            questionDTO.setQuestionSeq(i + 1);
-            this.saveQuestionDTO(questionDTO);
-            i++;
-        }
-
+        this.resortQuestionSeq(childQbId);
         return childQbId;
     }
 
@@ -514,17 +632,34 @@ public class QuestionBankServiceImpl implements QuestionBankService
     }
 
     /**
-     * 运营添加题目时，让对应的childQbNumber加1。
+     * 运营添加或者更改题目所属子题库时，更新子题库题目数计数
      * @param childQbId
      */
-    private void increaseChildQuestionBankQuestionNumber(String childQbId)
+    private void recountChildQuestionBankQuestionNumber(String childQbId)
     {
         ChildQuestionBank childQuestionBank = this.findCQBById(childQbId);
-        childQuestionBank.setQuestionNumber(childQuestionBank.getQuestionNumber() + 1);
-
+        childQuestionBank.setQuestionNumber(questionRepository.countByChildQbId(childQbId));
         childQuestionBankRepository.save(childQuestionBank);
     }
 
+    /**
+     * 重新为该题库排列题号
+     * @param childQbId
+     */
+    private void resortQuestionSeq(String childQbId)
+    {
+        List<QuestionDTO> questionDTOS = this.findQuestionListByCQBId(childQbId);
+
+        int i = 1;
+        for (QuestionDTO questionDTO : questionDTOS)
+        {
+            questionDTO.setQuestionSeq(i);
+            Question question = new Question();
+            BeanUtils.copyProperties(questionDTO,question);
+            questionRepository.save(question);
+            i++;
+        }
+    }
     /**
      * 运营添加子题库时，让对应的cqbNum加1。
      * @param parentQbId
@@ -533,6 +668,14 @@ public class QuestionBankServiceImpl implements QuestionBankService
     {
         ParentQuestionBank parentQuestionBank = this.findOneParentQuestionBank(parentQbId);
         parentQuestionBank.setCqbNumber(parentQuestionBank.getCqbNumber() + 1);
+
+        parentQuestionBankRepository.save(parentQuestionBank);
+    }
+
+    private void recountParentQuestionBankCQBNum(String parentQbId)
+    {
+        ParentQuestionBank parentQuestionBank = this.findOneParentQuestionBank(parentQbId);
+        parentQuestionBank.setCqbNumber(childQuestionBankRepository.countByParentQbId(parentQbId));
 
         parentQuestionBankRepository.save(parentQuestionBank);
     }

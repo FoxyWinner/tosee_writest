@@ -14,6 +14,6 @@ public interface MistakeBookRepository extends JpaRepository<MistakeBook, String
 {
     MistakeBook findByOpenidAndCqbId(String openid, String cqbid);
 
-    List<MistakeBook> findByOpenid(String openid);
+    List<MistakeBook> findByOpenidOrderByUpdateTimeDesc(String openid);
 
 }

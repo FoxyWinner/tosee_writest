@@ -13,23 +13,23 @@ import java.util.List;
 public interface ParentQuestionBankRepository extends JpaRepository<ParentQuestionBank, String>
 {
     // 热度倒序排列
-    List<ParentQuestionBank> findByPositionTypeAndPqbTypeOrderByPqbHeatDesc(Integer positionType, Integer pqbType);
+    List<ParentQuestionBank> findByPositionTypeAndPqbTypeAndIsRelaseOrderByPqbHeatDesc(Integer positionType, Integer pqbType,Integer isRelase);
 
     // 时间最新排列
-    List<ParentQuestionBank> findByPositionTypeAndPqbTypeOrderByRelaseTimeDesc(Integer positionType, Integer pqbType);
+    List<ParentQuestionBank> findByPositionTypeAndPqbTypeAndIsRelaseOrderByRelaseTimeDesc(Integer positionType, Integer pqbType,Integer isRelase);
 
     // 按多个岗位查询主题库列表(热度排序)
-    List<ParentQuestionBank> findByPositionTypeInAndPqbTypeOrderByPqbHeatDesc(List<Integer> positionTypes,Integer pqbType);
+    List<ParentQuestionBank> findByPositionTypeInAndPqbTypeAndIsRelaseOrderByPqbHeatDesc(List<Integer> positionTypes,Integer pqbType,Integer isRelase);
 
     // 按多个岗位查询主题库列表(时间排序)
-    List<ParentQuestionBank> findByPositionTypeInAndPqbTypeOrderByRelaseTimeDesc(List<Integer> positionTypes,Integer pqbType);
+    List<ParentQuestionBank> findByPositionTypeInAndPqbTypeAndIsRelaseOrderByRelaseTimeDesc(List<Integer> positionTypes,Integer pqbType,Integer isRelase);
 
-    List<ParentQuestionBank> findByIsRecommendedAndPqbTypeOrderByPqbHeatDesc(Integer isRecommended,Integer pqbType);
+    List<ParentQuestionBank> findByIsRecommendedAndPqbTypeAndIsRelaseOrderByPqbHeatDesc(Integer isRecommended,Integer pqbType,Integer isRelase);
 
-    List<ParentQuestionBank> findByIsRecommendedAndPqbTypeOrderByRelaseTimeDesc(Integer isRecommended,Integer pqbType);
+    List<ParentQuestionBank> findByIsRecommendedAndPqbTypeAndIsRelaseOrderByRelaseTimeDesc(Integer isRecommended,Integer pqbType,Integer isRelase);
 
     // 查询行测父题库列表
-    List<ParentQuestionBank> findByPqbTypeOrderByPqbHeat(Integer pqbType);
+    List<ParentQuestionBank> findByPqbTypeAndIsRelaseOrderByPqbHeat(Integer pqbType,Integer isRelase);
 
 
 }
