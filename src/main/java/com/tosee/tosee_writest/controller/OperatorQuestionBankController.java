@@ -364,6 +364,7 @@ public class OperatorQuestionBankController
             return new ModelAndView("common/error", map);
         }
 
+        log.info("form",form);
         QuestionDTO questionDTO = new QuestionDTO();
         try
         {
@@ -389,6 +390,7 @@ public class OperatorQuestionBankController
             Gson gson = gsonBuilder.create();
             List<QuestionOption> questionOptionList = gson.fromJson(form.getQuestionOptions(),  new TypeToken<List<QuestionOption>>(){}.getType());
 
+//            log.info("【选项列表】{}",questionOptionList);
             for (QuestionOption questionOption : questionOptionList)
             {
                 if (questionOption.getOptionId() == null || questionOption.getOptionId().isEmpty())

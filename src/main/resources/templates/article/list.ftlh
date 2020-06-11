@@ -32,12 +32,11 @@
                                 <td>${article.relaseTime}</td>
                                 <td>${article.author}</td>
                                 <td>${article.readerNumber}</td>
-                                i
                                 <td>
-                                    <a href="/toseewritest/operator/experience/articleindex?articleId=${article.articleId}" >修改</a>
+                                    <a class="btn btn-default" href="/toseewritest/operator/experience/articleindex?articleId=${article.articleId}" >修改</a>
 
                                 <td>
-                                    <a href="/toseewritest/operator/experience/questiondelete?deletearticle?articleId=${article.articleId}">删除</a>
+                                    <a class="btn btn-danger" disabled href="/toseewritest/operator/experience/questiondelete?deletearticle?articleId=${article.articleId}">删除</a>
                                 </td>
                             </tr>
                         </#list>

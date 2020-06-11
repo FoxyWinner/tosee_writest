@@ -13,6 +13,8 @@ import java.util.List;
  */
 public interface QuestionRepository extends JpaRepository<Question, String>
 {
+    List<Question> findByQuestionStemLike(String search);
+
     List<Question> findQuestionsByChildQbIdOrderByQuestionSeqAsc(String cqbId);
 
     Page<Question> findByChildQbIdOrderByQuestionSeqAsc(String cqbId,Pageable pageable);

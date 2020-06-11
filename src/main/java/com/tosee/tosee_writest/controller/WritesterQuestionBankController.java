@@ -93,6 +93,39 @@ public class WritesterQuestionBankController
 
         return ResultVOUtil.success(questionBankVOList);
     }
+
+    /**
+     * 首页搜索框
+     * @param openid
+     * @param search
+     * @param page
+     * @param size
+     * @return
+     */
+    @GetMapping("/searchqblist")
+    public ResultVO searchQuestionBankList(@RequestParam("openid") String openid,
+                                           @RequestParam("search") String search,
+
+                                           @RequestParam(value = "page",defaultValue = "0") Integer page,
+                                           @RequestParam(value = "size",defaultValue = "10") Integer size)
+    {
+        if(StringUtils.isEmpty(openid))
+        {
+            log.error("【搜索子题库】openid为空");
+            throw new WritestException(ResultEnum.PARAM_ERROR);
+        }
+
+        if(StringUtils.isEmpty(search))
+        {
+            log.error("【搜索子题库】search为空");
+            throw new WritestException(ResultEnum.PARAM_ERROR);
+        }
+
+        List<ChildQuestionBank> childQuestionBanks = questionBankService.searchChildQuestionBank(search);
+        List<ChildQuestionBankVO> result = this.convertToChildQuestionBankVOList(childQuestionBanks,openid);
+
+        return ResultVOUtil.success(result);
+    }
     @GetMapping("/childqblist")
     public ResultVO childQuestionBankList(@RequestParam("openid") String openid,
                                           @RequestParam("pqbId") String pqbId,
@@ -291,6 +324,7 @@ public class WritesterQuestionBankController
         List<QuestionDTO> questionDTOList = questionBankService.findQuestionListByCQBId(cqbId);
         List<QuestionVO> result = new ArrayList<>();
 
+        Integer simulSeq = 1;
         for (int i = 0 ; i < questionDTOList.size() ; i++)
         {
             QuestionVO questionVO = new QuestionVO();
@@ -303,8 +337,7 @@ public class WritesterQuestionBankController
                 {
                     QuestionOptionVO questionOptionVO = new QuestionOptionVO();
                     BeanUtils.copyProperties(questionOption,questionOptionVO);
-                    // seq要重设
-                    questionVO.setQuestionSeq(i+1);
+
                     questionOptionVOList.add(questionOptionVO);
                 }
 
@@ -314,19 +347,32 @@ public class WritesterQuestionBankController
             // 填入上次做题历史作答，如果是错题解析的话，应该需要这个userAnswer的吧
             questionVO.setUserAnswer(practiceRecordDTO.getUserAnswerList().get(questionVO.getQuestionSeq()-1));
 
+            // 填入是否仍是错题(这个字段不论全部解析还是错题解析，都需要)
+            Integer isInMistake = mistakeBookService.isInMistakeBook(openid,questionVO.getQuestionId());
+            questionVO.setIsInMistake(isInMistake);
 
             // 填入收藏状态
             questionVO.setCollectState(favoriteService.findByOpenidAndFavoriteTypeAndTargetId(openid, FavoriteTypeEnum.QUESTION.getCode(),questionVO.getQuestionId()));
 
             if(mistaken == 1)
             {
+                // 错题解析
                 // 只返错题，未作答的题和回答错误的题才叫错题
 //                if(StringUtils.isEmpty(userAnswerList.get(i)) || ((questionDTOList.get(i).getQuestionType()!=QuestionTypeEnum.ESSAY_QUESTION.getCode())  && !userAnswerList.get(i).equals(questionDTOList.get(i).getAnswer())))
 
                     if( ( questionVO.getQuestionType()!= QuestionTypeEnum.ESSAY_QUESTION.getCode() && !questionVO.getUserAnswer().equals(questionVO.getAnswer()))
                         || StringUtils.isEmpty(questionVO.getUserAnswer()))
-                    result.add(questionVO);
+                    {
+                        // 填入虚拟题号以Fix错题解析中题号大于题目总数的bug
+                        questionVO.setQuestionSeq(simulSeq);
+                        simulSeq++;
+
+
+                        result.add(questionVO);
+                    }
             }
+
+            // 全部解析
             else result.add(questionVO);
         }
         return ResultVOUtil.success(result);

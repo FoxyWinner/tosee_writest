@@ -14,6 +14,40 @@ https://toseewritest.mynatapp.cc//toseewritest/wechat/auth?code=123456
 
 仅当侯俊杰电脑打开内网穿透并运行Web程序时可用
 
+
+
+## 打卡每日一练篇
+
+### ### 打卡
+
+```http
+POST 
+```
+
+参数
+
+```json
+openid:on62f4kYUBt-AvuY11BcNNsCE4Ko
+```
+
+返回
+
+
+
+```json
+{
+    "code": 0,
+    "msg": "成功",
+      "data": {
+      "已完成题目":"on62f4kYUBt-AvuY11BcNNsCE4Ko"
+    }
+}
+```
+
+### 
+
+
+
 ## 我的信息篇
 
 ### 登录✅
@@ -249,6 +283,86 @@ type: 2  //0企业真题，1专业知识，2为“我的”专用
 ```
 
 ## 题库篇
+
+### 首页搜索
+
+```http
+GET /writester/questionbank/searchqblist
+```
+
+参数
+
+```json
+openid: 'osL8-5Wd-xYNiASJVjv59tDB-JzA'
+search: '运营'
+```
+
+返回
+
+```json
+{
+    "code": 0,
+    "msg": "成功",
+    "data": [
+        {
+            "childQbId": "15903194011801799949",
+            "questionNumber": 7,
+            "spentTime": 0,
+            "simulationTime": 30,
+            "complete": 0,
+            "completeNumber": 0,
+            "lastMode": 0,
+            "collectState": 0,
+            "title": "阿里文娱2019校招真题-问答题集锦",
+            "heat": 1245,
+            "correct": -1
+        },
+        {
+            "childQbId": "15903198933031200349",
+            "questionNumber": 1,
+            "spentTime": 0,
+            "simulationTime": 20,
+            "complete": 0,
+            "completeNumber": 0,
+            "lastMode": 0,
+            "collectState": 0,
+            "title": "阿里巴巴运营岗2017校招真题-问答题集锦",
+            "heat": 235,
+            "correct": -1
+        },
+        {
+            "childQbId": "15903420514021110055",
+            "questionNumber": 6,
+            "spentTime": 0,
+            "simulationTime": 60,
+            "complete": 0,
+            "completeNumber": 0,
+            "lastMode": 0,
+            "collectState": 0,
+            "title": "腾讯产品运营/策划2019校招真题",
+            "heat": 666,
+            "correct": -1
+        },
+        {
+            "childQbId": "15903421065521039213",
+            "questionNumber": 5,
+            "spentTime": 0,
+            "simulationTime": 50,
+            "complete": 0,
+            "completeNumber": 0,
+            "lastMode": 0,
+            "collectState": 0,
+            "title": "腾讯游戏运营2019校招真题",
+            "heat": 1316,
+            "correct": -1
+        }
+    ]
+}
+```
+
+### 热点题库：
+
+首页热点题库，选取数据库中热度最高的6套子题库
 
 ### 行业和职位列表✅
 
@@ -724,7 +838,8 @@ mistaken:1 // 当mistaken为1的时候是错题解析，0的时候是全部解�
             ] ,
           	"answer": "D",
           	"explanation": "首先观察四个选项的分布，根据少数服从多数原则，初定（2）为首句，而观察四个选项的尾句可看出（2）同样是多数项，因此需要根据首尾句的特点来判断（2）适合做句首还是句尾。观察（2）“正是”属于结论性的表述，不适合做首句，排除 AC 选项；对比（5）和（4），（4）将时间管理比喻为抛鸡蛋的话题，（5）则是对如何做好抛鸡蛋动作的具体描述，因此（4）应在（5）前。故初定选项为 D。将 D 项进行关联性验证，先由（4）引出时间管理像抛鸡蛋的话题，（6）对抛鸡蛋动作进行描述，（5）提出要做好抛鸡蛋这个动作需要具备三种品质，（1）指出良好的时间管理同样需要具备这三种品质，这是（3）中面对糟糕局面进行控制的能力，（2）进行总结。通过验证可知 D 正确，因此正确答案为 D 选项",
-            "collectState": 0 //未收藏
+            "collectState": 0 ,//未收藏
+        		"isInMistake": 0,
           },
       
           {
@@ -754,13 +869,12 @@ mistaken:1 // 当mistaken为1的时候是错题解析，0的时候是全部解�
             
           	"answer": "B",
           	"explanation": "本题规律为后一项除以前一项，得到新的质数数列 2、3、5、7、（），所以（）=11，答案为 210×11。因此，本题答案选择 B 选项。",
-            "collectState": 1 //已收藏
+            "collectState": 1, //已收藏
+            "isInMistake": 1
           }
         ]
 }
 ```
-
-Response_description:略
 
 ### 中途退出子题库or完成题库✅
 

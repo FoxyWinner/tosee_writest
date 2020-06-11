@@ -23,7 +23,9 @@ import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Author: FoxyWinner
@@ -56,6 +58,47 @@ public class QuestionBankServiceImpl implements QuestionBankService
 
     @Autowired
     private WorkFieldRepository workFieldRepository;
+
+    @Override
+    public List<ChildQuestionBank> searchChildQuestionBank(String search)
+    {
+        // 覆盖主题库岗位 主题库名 子题库名
+        // 思路是创建集合，通过这些方式将ID填写进去，然后拿到实体，按热度排名
+        Set<String> cqbIdsSet = new HashSet<>();
+
+
+        // 岗位
+//        List<WorkPosition> workPositionsSearched = workPositionRepository.findByPositionNameLike("%"+search+"%");
+
+
+
+        // 按主题库名
+        List<ParentQuestionBank> parentQuestionBanksSearched = parentQuestionBankRepository.findByPqbTitleLike("%"+search+"%");
+        for (ParentQuestionBank parentQuestionBank : parentQuestionBanksSearched)
+        {
+            List<ChildQuestionBank> childQuestionBanks = this.findCQBListByPQBIdOrderBy(parentQuestionBank.getParentQbId(),QuestionBankSortEnum.SORT_BY_HEAT_DESC);
+            for (ChildQuestionBank childQuestionBank : childQuestionBanks)
+                cqbIdsSet.add(childQuestionBank.getChildQbId());
+        }
+
+
+
+        // 子题库名搜索
+        List<ChildQuestionBank> childQuestionBanksSearched = childQuestionBankRepository.findByCqbTitleLike("%"+search+"%");
+        for (ChildQuestionBank childQuestionBank : childQuestionBanksSearched)
+            cqbIdsSet.add(childQuestionBank.getChildQbId());
+
+        // 题库题干搜索
+        List<Question> questionsSearched = questionRepository.findByQuestionStemLike("%"+search+"%");
+        for (Question question : questionsSearched)
+            cqbIdsSet.add(question.getChildQbId());
+
+
+
+        List<ChildQuestionBank> result = childQuestionBankRepository.findAllById(cqbIdsSet);
+        return result;
+    }
+
     @Override
     public List<ParentQuestionBank> findPQBListByPositionTypeAndPqbTypeOrderBy(Integer positionType, Integer pqbType, QuestionBankSortEnum sortRule)
     {
@@ -523,6 +566,7 @@ public class QuestionBankServiceImpl implements QuestionBankService
         if (question == null)
         {
             // 要新增
+            question = new Question();
             BeanUtils.copyProperties(questionDTO,question);
             result = questionRepository.save(question);
             // 新增之后子题库题目数量 + 1

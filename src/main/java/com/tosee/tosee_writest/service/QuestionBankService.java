@@ -17,6 +17,13 @@ import java.util.List;
 
 public interface QuestionBankService
 {
+    /**
+     * 搜索（模糊查找）子题库列表，关键字模糊查找，覆盖主题库岗位 主题库名 子题库名 题目题干岗位
+     * @param search
+     * @return
+     */
+    List<ChildQuestionBank> searchChildQuestionBank(String search);
+
     /** 查询主题库列表
      * @param positionType
      * @param pqbType 题库类型

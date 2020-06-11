@@ -10,7 +10,6 @@ import com.tosee.tosee_writest.service.PracticeRecordService;
 import com.tosee.tosee_writest.utils.KeyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.dc.pr.PRError;
 
 import java.util.ArrayList;
 import java.util.List;

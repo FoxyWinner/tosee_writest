@@ -33,4 +33,6 @@ public class QuestionVO
     private String explanation;
 
     private Integer collectState;
+
+    private Integer isInMistake;
 }

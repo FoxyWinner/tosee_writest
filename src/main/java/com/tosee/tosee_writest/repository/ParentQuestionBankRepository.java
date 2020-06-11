@@ -12,6 +12,9 @@ import java.util.List;
  */
 public interface ParentQuestionBankRepository extends JpaRepository<ParentQuestionBank, String>
 {
+    // 按题库名检索
+    List<ParentQuestionBank> findByPqbTitleLike(String search);
+
     // 热度倒序排列
     List<ParentQuestionBank> findByPositionTypeAndPqbTypeAndIsRelaseOrderByPqbHeatDesc(Integer positionType, Integer pqbType,Integer isRelase);
 

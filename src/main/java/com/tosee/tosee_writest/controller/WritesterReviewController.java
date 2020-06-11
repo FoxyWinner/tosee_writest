@@ -219,6 +219,11 @@ public class WritesterReviewController
         return ResultVOUtil.success();
     }
 
+    /**
+     * todo 待重构 重构成根据用户信息推荐。如果用户未填写岗位信息，就目前这个就行
+     * @param openid
+     * @return
+     */
     @GetMapping("/recommendlist")
     public ResultVO recommendList(@RequestParam("openid") String openid)
     {

@@ -24,7 +24,7 @@ public class ExperienceArticleForm
     @NotEmpty(message = "作者必填")
     private String author;
 
-    @NotEmpty(message = "内容必填")
+
     private String content;
 
     @NotNull(message = "阅读数必填")

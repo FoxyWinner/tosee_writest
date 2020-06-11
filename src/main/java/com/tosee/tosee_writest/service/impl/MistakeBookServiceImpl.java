@@ -156,4 +156,15 @@ public class MistakeBookServiceImpl implements MistakeBookService
             mistakeBookRepository.save(mistakeBook);
         }
     }
+
+    @Override
+    public Integer isInMistakeBook(String openid, String questionId)
+    {
+        Mistake mistake = mistakeRepository.findByOpenidAndQuestionId(openid,questionId);
+        if (mistake ==  null)
+        {
+            return 0;
+        }
+        return 1;
+    }
 }

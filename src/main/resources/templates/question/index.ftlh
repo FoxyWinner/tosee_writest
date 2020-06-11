@@ -1,5 +1,7 @@
 <html>
 <#include "../common/header.ftlh">
+<#--layui css-->
+<link rel="stylesheet" href="/toseewritest/layui/css/layui.css"  media="all">
 
 <body>
 <div id="wrapper" class="toggled">
@@ -51,8 +53,10 @@
 
                         <div class="form-group">
                             <label>题干</label>
-                            <input name="questionStem" type="text" class="form-control" data-error="题干必填" required value="${(questionDTO.questionStem)!''}"/>
-<#--                            <span class="glyphicon glyphicon-ok form-control-feedback"></span>-->
+                            <p class="help-block" id="options-help-block">
+                                题干可以暂时为空，但不建议输入题干为空的题目。
+                            </p>
+                            <textarea name="questionStem" id="content" class="form-control" rows="20" onchange="">${(questionDTO.questionStem)!''}</textarea>
                             <div class="help-block with-errors"></div>
                         </div>
 
@@ -70,28 +74,40 @@
 
                         <div class="form-group" id="questionOptionsDiv">
                             <label>选项</label>
-                            <p class="help-block" id="options-help-block">
-                                修改题目时，optionId和questionId不要改写！
-                            </p>
-                            <textarea name="questionOptions" id="questionOptions" class="form-control" rows="20" data-error="选项必填" required>${(questionDTO.getOptionsJson())!''}</textarea>
+<#--                            实际上要填这个questionOptions-->
+                            <input readonly name="questionOptions" id="questionOptions" class="form-control" rows="20"  value="${(questionDTO.getOptionsJson())!''}"/>
+                            <br>
+
+                            <#if questionDTO?? && questionDTO.questionOptions??>
+                                <#assign optionsJson="${questionDTO.getOptionsJson()}"?eval />
+                                <#list optionsJson as optionJson>
+                                    <div class="form-group">
+                                        <div class="input-group" >
+                                            <span class="input-group-addon">${optionJson.optionName}</span>
+                                            <input id="optionInput${optionJson_index}" type="text" class="form-control"  oninput="onOptionInput(${optionJson_index})" value="${optionJson.optionValue}">
+                                        </div>
+                                    </div>
+                                </#list>
+                            <#else>
+                                <#list 0..3 as i>
+                                    <div class="form-group">
+                                        <div class="input-group" >
+<#--                                            span由JS填充-->
+                                            <span class="input-group-addon" id="optionName${i}">
+                                            </span>
+                                            <input id="optionInput${i}" type="text" class="form-control"  oninput="onOptionInput(${i})">
+                                        </div>
+                                    </div>
+                                </#list>
+                            </#if>
                             <div class="help-block with-errors"></div>
                         </div>
-
-<#--                        freemarkerjson解析-->
-<#--                        <#if questionDTO??>-->
-<#--                            <#assign optionsJson="${questionDTO.getOptionsJson()}"?eval />-->
-<#--                            <#list optionsJson as optionJson>-->
-<#--                                ${optionJson.optionName}:${optionJson.optionValue}-->
-<#--                            </#list>-->
-<#--                        </#if>-->
 
 
 
                         <#--                        隐藏的字段 为了传给save-->
                         <input hidden type="text" name="questionId" value="${(questionDTO.questionId)!''}">
                         <button type="submit" class="btn btn-danger">提交</button>
-<#--                        <button type="button" class="btn btn-danger" id="submitBtn">提交（正在测试请勿使用）</button>-->
-
                     </form>
                 </div>
             </div>
@@ -101,32 +117,48 @@
 </div>
 </body>
 </html>
+<#--题干富文本编辑器-->
+<script src="/toseewritest/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use('layedit', function()
+    {
+        var layedit = layui.layedit
+            ,$ = layui.jquery;
 
+        layedit.set({
+            uploadImage: {
+                url: '/toseewritest/image/richtextupload' //接口url
+                ,type: 'post'
+            }
+        });
+
+        var index = layedit.build('content', {
+            tool: [  'strong','italic','underline','del','|','left','center','right','link','unlink','image']
+        });
+
+
+    });
+</script>
+
+<#--选项-->
 <script type="text/javascript">
-    var defaultOptionStr = '[\n' +
-        '  {\n' +
-        '    "optionName": "A",\n' +
-        '    "optionValue": ""\n' +
-        '  },\n' +
-        '  {\n' +
-        '    "optionName": "B",\n' +
-        '    "optionValue": ""\n' +
-        '  },\n' +
-        '  {\n' +
-        '    "optionName": "C",\n' +
-        '    "optionValue": ""\n' +
-        '  },\n' +
-        '  {\n' +
-        '    "optionName": "D",\n' +
-        '    "optionValue": ""\n' +
-        '  }\n' +
-        ']';
+    // 初始化
 
+    // 若为新增
     <#if !questionDTO??>
+        // 默认JSON
+        var defaultOptionStr = "[{\"optionName\":\"A\",\"optionValue\":\"\"},{\"optionName\":\"B\",\"optionValue\":\"\"},{\"optionName\":\"C\",\"optionValue\":\"\"},{\"optionName\":\"D\",\"optionValue\":\"\"}]";
+        // input赋值
         $("#questionOptions").val(defaultOptionStr);
-        $("#options-help-block").hide();
+        // 选项名显示
+        var jsonObjs = JSON.parse(defaultOptionStr);
+        for (var i in jsonObjs)
+        {
+            $("#optionName"+i).html(jsonObjs[i].optionName);
+        }
     </#if>
 
+    // 若为更改且为问答题
     <#if  questionDTO?? && questionDTO.questionType == 3>
         // 隐藏
         $("#questionOptionsDiv").hide();
@@ -150,27 +182,12 @@
         }
     }
 
-    // $("#submitBtn").click(function()
-    // {
-    //     // 先校验，校验通过才走提交流程
-    //     if($("#questionForm").validator('validate'))
-    //     {
-    //         var targetUrl = $("#questionForm").attr("action")+"ajax";
-    //         var data = $("#questionForm").serialize();
-    //         $.ajax({
-    //             type:'post',
-    //             url:targetUrl,
-    //             cache: false,
-    //             data:data,  //重点必须为一个变量如：data
-    //             dataType:'json',
-    //             success:function(data){
-    //                 alert('添加成功');
-    //                 console.log(data);
-    //             },
-    //             error:function(){
-    //                 alert("添加失败")
-    //             }
-    //         })
-    //     }
-    // })
+    // 选项值变动触发函数
+    function onOptionInput(index) {
+        // 定位选名 插入json obj
+        var jsonStr = $("#questionOptions").val();
+        var jsonObj = JSON.parse(jsonStr);
+        jsonObj[index].optionValue = $("#optionInput"+index).val();
+        $("#questionOptions").val(JSON.stringify(jsonObj));
+    }
 </script>

@@ -20,7 +20,7 @@
                             <th>模拟时长</th>
                             <th>热度</th>
                             <th>发布时间</th>
-                            <th colspan="3">操作</th>
+                            <th colspan="2">操作</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -35,15 +35,15 @@
                                 <td>${childQuestionBank.relaseTime}</td>
 
                                 <td>
-                                    <a href="/toseewritest/operator/questionbank/cqbindex?childQbId=${childQuestionBank.childQbId}" >修改</a>
+                                    <a class="btn btn-default" href="/toseewritest/operator/questionbank/cqbindex?childQbId=${childQuestionBank.childQbId}" >修改</a>
                                 </td>
 
-                                <td>
-                                    <a href="/toseewritest/operator/questionbank/cqbrecommend?childQbId=${childQuestionBank.childQbId}">推荐</a>
-                                </td>
+<#--                                <td>-->
+<#--                                    <a href="/toseewritest/operator/questionbank/cqbrecommend?childQbId=${childQuestionBank.childQbId}">推荐</a>-->
+<#--                                </td>-->
 
                                 <td>
-                                    <a href="/toseewritest/operator/questionbank/questionlist?childQbId=${childQuestionBank.childQbId}">题目</a>
+                                    <a class="btn btn-primary" href="/toseewritest/operator/questionbank/questionlist?childQbId=${childQuestionBank.childQbId}">题目列表</a>
                                 </td>
                             </tr>
                         </#list>

@@ -27,10 +27,13 @@ wechat:
     openAppId: wxe52fcab96b371e3f
     openAppSecret: b5e87b668f795edb852769cdfc1165cc
 
-projectUrl:
-  wechatMpAuthorize: https://toseewritest.mynatapp.cc
-  wechatOpenAuthorize: https://toseewritest.mynatapp.cc
-  toseewritest: https://toseewritest.mynatapp.cc
 server:
   servlet:
     context-path: /toseewritest  #prefix
+
+ftp:
+  server: 152.136.232.126
+  port: 21
+  username: writestftp
+  password: toseecareer
+  host: https://img.toseecareer.com/

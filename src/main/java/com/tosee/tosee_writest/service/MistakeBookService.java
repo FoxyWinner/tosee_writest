@@ -12,15 +12,17 @@ import java.util.List;
  */
 public interface MistakeBookService
 {
-    public MistakeBook initAMistakeBook(String openid, String cqbId);
+    MistakeBook initAMistakeBook(String openid, String cqbId);
 
-    public MistakeBook addMistake(List<String> questionIds, MistakeBook mistakeBook);
+    MistakeBook addMistake(List<String> questionIds, MistakeBook mistakeBook);
 
-    public MistakeBook findMistakeBook(String openid, String cqbid);
+    MistakeBook findMistakeBook(String openid, String cqbid);
 
-    public List<MistakeBookDTO> findAllMistakeBooks(String openid);
+    List<MistakeBookDTO> findAllMistakeBooks(String openid);
 
-    public MistakeBookDTO findMistakeBookById(String mistakeBookId);
+    MistakeBookDTO findMistakeBookById(String mistakeBookId);
 
-    public void deleteMistake(String openid, String questionId);
+    void deleteMistake(String openid, String questionId);
+
+    Integer isInMistakeBook(String openid, String questionId);
 }
