@@ -13,10 +13,15 @@ import com.tosee.tosee_writest.service.UserService;
 import com.tosee.tosee_writest.utils.KeyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.beans.PropertyDescriptor;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Author: FoxyWinner
@@ -46,11 +51,14 @@ public class UserServiceImpl implements UserService
         {
             // 得保留userId
             String userId = user.getUserId();
-            BeanUtils.copyProperties(userDTO,user);
-            // 复写回去
+            BeanUtils.copyProperties(userDTO,user,this.getNullPropertyNames(userDTO));
+            // 复写回去,不然可能被userDTO中空的ID所覆盖
             user.setUserId(userId);
-            user.setTargetFields(userDTO.getTargetFields().toString());
-            user.setTargetPositions(userDTO.getTargetPositions().toString());
+
+            if (userDTO.getTargetFields() != null)
+                user.setTargetFields(userDTO.getTargetFields().toString());
+            if (userDTO.getTargetPositions() != null)
+                user.setTargetPositions(userDTO.getTargetPositions().toString());
         }
 
         userRepository.save(user);
@@ -72,6 +80,26 @@ public class UserServiceImpl implements UserService
 
         return result;
     }
+
+    public String[] getNullPropertyNames (Object source)
+    {
+        final BeanWrapper src = new BeanWrapperImpl(source);
+        PropertyDescriptor[] pds = src.getPropertyDescriptors();
+
+        Set<String> emptyNames = new HashSet<>();
+        for (PropertyDescriptor pd : pds)
+        {
+            Object srcValue = src.getPropertyValue(pd.getName());
+            // 此处判断可根据需求修改
+            if (srcValue == null)
+            {
+                emptyNames.add(pd.getName());
+            }
+        }
+        String[] result = new String[emptyNames.size()];
+        return emptyNames.toArray(result);
+    }
+
 
 
 }

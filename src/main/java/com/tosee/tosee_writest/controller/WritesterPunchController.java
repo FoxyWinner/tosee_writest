@@ -195,6 +195,7 @@ public class WritesterPunchController
         Integer allSeconds = punchClock.getExerciseTime();
         result.setExerciseTime(this.getExerciseTimeStr(allSeconds));
         result.setProfilePhoto(userDTO.getProfilePhotoUrl());
+        result.setUserName(userDTO.getUserName());
         result.setInsistDays(punchClockRepository.countByOpenidAndPunchState(openid,PunchStateEnum.ALREADY_CLOCKIN.getCode()));
 
         return ResultVOUtil.success(result);

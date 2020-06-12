@@ -24,7 +24,7 @@ public class UserInfoForm
 
     private String profilePhotoUrl;
 
-    // 非毕传项目，当saveInfo触发时自动填1，数据库里默认为0
+    // 非必传项目，当saveInfo触发时自动填1，数据库里默认为0
     private Integer authorised;
 
 

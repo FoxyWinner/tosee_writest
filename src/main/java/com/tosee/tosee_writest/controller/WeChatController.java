@@ -261,4 +261,7 @@ public class WeChatController
         return miniUserInfoVO;
     }
 
+
+
+
 }

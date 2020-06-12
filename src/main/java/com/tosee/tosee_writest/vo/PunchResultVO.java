@@ -16,6 +16,8 @@ public class PunchResultVO
 
     private String profilePhoto;
 
+    private String userName;
+
     private Integer completeNumber;
 
     private Integer correctRatio;

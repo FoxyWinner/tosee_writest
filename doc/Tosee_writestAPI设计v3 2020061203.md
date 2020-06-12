@@ -76,6 +76,7 @@ openid:on62f4kYUBt-AvuY11BcNNsCE4Ko
         "isFirstTimePunch": 0, // 若第一次打卡这个为1，若是重复打卡则这个为0
         "punchState": 2,
         "profilePhoto": "http://pic1.zhimg.com/50/v2-fce4f8a778fe3f24bca2cafc709b6847_hd.jpg",
+      	"userName":"惊天动地阳光大男孩",
         "completeNumber": 0,
         "correctRatio": 0,
         "exerciseTime": "13分钟",
