@@ -1,13 +1,7 @@
 package com.tosee.tosee_writest.converter;
-import com.tosee.tosee_writest.dataobject.ChildQuestionBank;
 import com.tosee.tosee_writest.dto.PracticeRecordDTO;
 import com.tosee.tosee_writest.form.RecordForm;
-import com.tosee.tosee_writest.repository.ChildQuestionBankRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 public class RecordForm2PracticeRecordDTOConverter

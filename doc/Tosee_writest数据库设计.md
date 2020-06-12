@@ -45,7 +45,69 @@ create table `user`(
   `update_time`  timestamp not null default current_timestamp on update current_timestamp comment '修改时间',
   
   primary key (`user_id`),
+  UNIQUE KEY `uqe_open_id` (`openid`) 
+);
+```
+
+### 打卡表✅
+
+一天一条记录比较好
+
+打卡记录时先判断数据库中有没有该openid在今日的record 没有的话根据currentdate创建一条
+
+打卡记录接口（做题数 正确数 实际做题时间 ） 打卡接口
+
+打卡天数直接count就行 因为求的不是连续打卡天数
+
+```mysql
+create table `punch_clock`(
+  
+  `punch_id` varchar(32) not null ,
+  
+  `openid` varchar(64) not null comment '微信openid',
+  
+  `punch_date` date not null comment '该条记录对应的打卡日期，一个id和日期只对应一条记录',
+  
+	`punch_state` tinyint(3) not null comment '打卡状态0未满足打卡条件未打卡1满足打卡条件未打卡，2已打卡',
+  
+  /* 今日刷题数 今日正确率 今日学习时长*/
+  
+ 	`complete_number` int not null default 0 comment '今日已完成题目数',
+  
+  `solve_number` int not null default 0 comment '今日已做对题目数，可计算今日正确率',
+  
+ 	`exercise_time` int not null default 0 comment '今日练习时长，单位分钟',
+  
+  
+  /* 时间戳 */
+
+  `create_time` timestamp not null default current_timestamp comment '创建时间',
+
+  `update_time`  timestamp not null default current_timestamp on update current_timestamp comment '修改时间',
+  
+  primary key (`punch_id`),
   UNIQUE KEY `uqe_open_id` (`open_id`) 
+);
+```
+
+### 意见反馈表
+
+```mysql
+create table `feedback`(
+  
+  `feedback_id` varchar(32) not null ,
+  
+  `openid` varchar(64) not null comment '微信openid',
+  
+  `content` text not null comment '反馈内容',
+  
+  /* 时间戳 */
+
+  `create_time` timestamp not null default current_timestamp comment '创建时间',
+
+  `update_time`  timestamp not null default current_timestamp on update current_timestamp comment '修改时间',
+  
+  primary key (`feedback_id`)
 );
 ```
 

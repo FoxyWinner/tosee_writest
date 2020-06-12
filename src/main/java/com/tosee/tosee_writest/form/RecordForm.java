@@ -22,6 +22,12 @@ public class RecordForm
     @NotNull(message = "完成数必填")
     private Integer completeNumber;
 
+    // 如果是complete=1的话，就把正确题目数传过来
+//    private Integer solveNumber;
+
+    @NotNull(message = "这次消耗的实际时长不能为空")
+    private Integer thisTimeSpent;
+
     @NotNull(message = "花费时间完成必填")
     private Integer spentTime;
 

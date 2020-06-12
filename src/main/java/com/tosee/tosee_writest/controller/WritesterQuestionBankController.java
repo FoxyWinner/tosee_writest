@@ -8,8 +8,10 @@ import com.tosee.tosee_writest.dto.QuestionDTO;
 import com.tosee.tosee_writest.enums.*;
 import com.tosee.tosee_writest.exception.WritestException;
 import com.tosee.tosee_writest.form.RecordForm;
+import com.tosee.tosee_writest.repository.PunchClockRepository;
 import com.tosee.tosee_writest.service.*;
 import com.tosee.tosee_writest.utils.EnumUtil;
+import com.tosee.tosee_writest.utils.KeyUtil;
 import com.tosee.tosee_writest.utils.ResultVOUtil;
 import com.tosee.tosee_writest.vo.*;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +23,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author: FoxyWinner
@@ -50,6 +49,12 @@ public class WritesterQuestionBankController
 
     @Autowired
     private MistakeBookService mistakeBookService;
+
+    @Autowired
+    private PunchClockService punchClockService;
+
+    @Autowired
+    private PunchClockRepository punchClockRepository;
 
     @PostMapping("/enterpriseqblist")
     public ResultVO parentQuestionBankListTest(@RequestParam("openid") String openid,
@@ -126,6 +131,28 @@ public class WritesterQuestionBankController
 
         return ResultVOUtil.success(result);
     }
+
+//    /writester/questionbank/hotpointcqblist
+@GetMapping("/hotpointcqblist")
+public ResultVO hotpointcqblist(@RequestParam("openid") String openid)
+{
+    if(StringUtils.isEmpty(openid))
+    {
+        log.error("【查询子题库列表】openid为空");
+        throw new WritestException(ResultEnum.PARAM_ERROR);
+    }
+
+
+    //获取childQuesitonBanks并填入记录相关信息到VO
+    List<ChildQuestionBank> childQuestionBanks = questionBankService.findHotPoint6CQBs();
+    log.info("childQuestionBanks{}",childQuestionBanks);
+    List<ChildQuestionBankVO> result = this.convertToChildQuestionBankVOList(childQuestionBanks,openid);
+
+    return ResultVOUtil.success(result);
+}
+
+
+
     @GetMapping("/childqblist")
     public ResultVO childQuestionBankList(@RequestParam("openid") String openid,
                                           @RequestParam("pqbId") String pqbId,
@@ -437,13 +464,8 @@ public class WritesterQuestionBankController
         if(practiceRecordDTO.getComplete() == RecordStateEnum.COMPLETED.getCode())
         {
             practiceRecordDTO.setLastMode(RecordLastModeEnum.UNKOWN_MODE.getCode());
-
             // todo  现在是根据用户的正确率来映射的假超越率
             practiceRecordDTO.setSurpassRatio(this.surpassRatioFromCorrect(practiceRecordDTO.getCorrectRatio()));
-            log.info("正确率{}",practiceRecordDTO.getCorrectRatio());
-            log.info("超越率{}",practiceRecordDTO.getSurpassRatio());
-
-
             result.put("surpassRatio",practiceRecordDTO.getSurpassRatio());
         }
 
@@ -452,36 +474,12 @@ public class WritesterQuestionBankController
 
         log.info("【创建记录】子题库标题为{}",practiceRecordDTO.getChildQbTitle());
 
-
         practiceRecordService.addOrUpdateRecord(practiceRecordDTO);
 
-        //完成作答才记录错题
-        if(recordForm.getComplete() == 1)
-        {
-            // 在记录之前，如果是完成的记录，则将【未作答和错题】计入错题本！
-            // 1. 先拿到错题IDs
-            List<String> userAnswerList = recordForm.getUserAnswerList();
-            List<String> wrongQuestionIds = new ArrayList<>();
-            List<Integer> wrongQuestionSeqs = new ArrayList<>();
-
-            List<QuestionDTO> questionDTOList = questionBankService.findQuestionListByCQBId(recordForm.getCqbId());
-            for (int i = 0; i < questionDTOList.size(); i++)
-            {
-                // 筛选未作答和错题 (问答题只要非空就算正确)
-                if(StringUtils.isEmpty(userAnswerList.get(i)) || ((questionDTOList.get(i).getQuestionType()!=QuestionTypeEnum.ESSAY_QUESTION.getCode())  && !userAnswerList.get(i).equals(questionDTOList.get(i).getAnswer())))
-                {
-                    wrongQuestionIds.add(questionDTOList.get(i).getQuestionId());
-                    wrongQuestionSeqs.add(questionDTOList.get(i).getQuestionSeq());
-                }
-            }
-            log.info("【创建错题本】用户这次做错了{}题",wrongQuestionSeqs);
-
-            // 2. 添加到错题本
-            MistakeBook mistakeBook = mistakeBookService.findMistakeBook(recordForm.getOpenid(),recordForm.getCqbId());
-            if (mistakeBook == null) mistakeBook = mistakeBookService.initAMistakeBook(recordForm.getOpenid(),recordForm.getCqbId());
-            mistakeBookService.addMistake(wrongQuestionIds,mistakeBook);
-        }
-
+        //记录错题
+        recordMistakes(recordForm);
+        // 更新打卡相关数据
+        recordPunchData(recordForm);
 
         return ResultVOUtil.success(result);
     }
@@ -563,5 +561,88 @@ public class WritesterQuestionBankController
         return randomInt;
     }
 
+
+    /**
+     * 记录错题
+     * @param recordForm
+     */
+    public void recordMistakes(RecordForm recordForm)
+    {
+        if(recordForm.getComplete() == 1)
+        {
+            // 在记录之前，如果是完成的记录，则将【未作答和错题】计入错题本！
+            // 1. 先拿到错题IDs
+            List<String> userAnswerList = recordForm.getUserAnswerList();
+            List<String> wrongQuestionIds = new ArrayList<>();
+            List<Integer> wrongQuestionSeqs = new ArrayList<>();
+
+            List<QuestionDTO> questionDTOList = questionBankService.findQuestionListByCQBId(recordForm.getCqbId());
+            for (int i = 0; i < questionDTOList.size(); i++)
+            {
+                // 筛选未作答和错题 (问答题只要非空就算正确)
+                if(StringUtils.isEmpty(userAnswerList.get(i)) || ((questionDTOList.get(i).getQuestionType()!=QuestionTypeEnum.ESSAY_QUESTION.getCode())  && !userAnswerList.get(i).equals(questionDTOList.get(i).getAnswer())))
+                {
+                    wrongQuestionIds.add(questionDTOList.get(i).getQuestionId());
+                    wrongQuestionSeqs.add(questionDTOList.get(i).getQuestionSeq());
+                }
+            }
+            log.info("【创建错题本】用户这次做错了{}题",wrongQuestionSeqs);
+
+            // 2. 添加到错题本
+            MistakeBook mistakeBook = mistakeBookService.findMistakeBook(recordForm.getOpenid(),recordForm.getCqbId());
+            if (mistakeBook == null) mistakeBook = mistakeBookService.initAMistakeBook(recordForm.getOpenid(),recordForm.getCqbId());
+            mistakeBookService.addMistake(wrongQuestionIds,mistakeBook);
+        }
+    }
+    /**
+     * 更新用户打卡相关数据
+     * @param recordForm
+     */
+    public void recordPunchData(RecordForm recordForm)
+    {
+        // 获取打卡用户条目
+        PunchClock punchClock =punchClockService.findByOpenidAndPunchDate(recordForm.getOpenid(),new java.sql.Date(System.currentTimeMillis()));
+
+        if (punchClock == null)
+        {
+            log.info("【做题记录】punchClock{}",punchClock);
+            // 新建
+            punchClock = new PunchClock();
+            punchClock.setPunchId(KeyUtil.genUniqueKey());
+            punchClock.setOpenid(recordForm.getOpenid());
+            punchClock.setPunchState(PunchStateEnum.NOT_UP_TO_STANDARD_AND_NOT_CLOCKIN.getCode());
+            java.sql.Date date = new java.sql.Date(System.currentTimeMillis());
+            punchClock.setPunchDate(date);
+
+            punchClock.setCompleteNumber(0);
+            punchClock.setSolveNumber(0);
+            punchClock.setExerciseTime(0);
+        }
+
+        // 如果是完成，那么记录三项属性（完成数 正确数 ）
+        if(recordForm.getComplete() == 1)
+        {
+            punchClock.setCompleteNumber(punchClock.getCompleteNumber() + recordForm.getCompleteNumber());
+            // 由于数据库里没有存储正确题数字段 所以我们先根据正确率来反推该数值 这可能会造成数值上有些偏差
+            punchClock.setSolveNumber(punchClock.getSolveNumber() + (recordForm.getCompleteNumber() * recordForm.getCorrect() / 100));
+            // todo 这里用到了新字段 需要跟前端商量
+            punchClock.setExerciseTime(punchClock.getExerciseTime() + recordForm.getThisTimeSpent()); // 存的是秒，传给前端打卡数据的时候要转HM
+
+            if (punchClock.getPunchState() != PunchStateEnum.ALREADY_CLOCKIN.getCode())
+            {
+                // 如果打完卡了那肯定不要置成2
+                punchClock.setPunchState(PunchStateEnum.UP_TO_STANDARD_BUT_NOT_CLOCKIN.getCode());
+            }
+
+        }
+        // 如果不是完成 是中途退出 那么只记录一项属性：消耗时长
+        else
+        {
+
+            // todo 这里用到了新字段 需要跟前端商量
+            punchClock.setExerciseTime(punchClock.getExerciseTime() + recordForm.getThisTimeSpent()); // 存的是秒，传给前端打卡数据的时候要转HM
+        }
+        punchClockRepository.save(punchClock);
+    }
 
 }

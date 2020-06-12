@@ -18,10 +18,46 @@ https://toseewritest.mynatapp.cc//toseewritest/wechat/auth?code=123456
 
 ## 打卡每日一练篇
 
-### ### 打卡
+### 查看打卡状态✅ 待对接
 
 ```http
-POST 
+GET /writester/punch/getstate
+```
+
+参数
+
+```json
+openid: on62f4kYUBt-AvuY11BcNNsCE4Ko
+```
+
+返回
+
+```json
+{
+    "code": 0,
+    "msg": "成功",
+    "data": {
+        "punchState": 2,
+        "completeNumber": 0,
+        "correctRatio": 0,
+        "exerciseTime": "13分钟",
+        "insistDays": 1
+    }
+}
+```
+
+### 打卡✅ 待对接
+
+打卡的时候直接调用该接口，只要code为0就说明打卡成功了。
+
+如果未达到打卡标准（punchState不为1），打卡不会成功
+
+调用前请务必调用获取授权状态来查看用户是否授权。
+
+
+
+```http
+GET /writester/punch/punchclock
 ```
 
 参数
@@ -32,21 +68,48 @@ openid:on62f4kYUBt-AvuY11BcNNsCE4Ko
 
 返回
 
-
-
 ```json
 {
     "code": 0,
     "msg": "成功",
-      "data": {
-      "已完成题目":"on62f4kYUBt-AvuY11BcNNsCE4Ko"
+    "data": {
+        "isFirstTimePunch": 0, // 若第一次打卡这个为1，若是重复打卡则这个为0
+        "punchState": 2,
+        "profilePhoto": "http://pic1.zhimg.com/50/v2-fce4f8a778fe3f24bca2cafc709b6847_hd.jpg",
+        "completeNumber": 0,
+        "correctRatio": 0,
+        "exerciseTime": "13分钟",
+        "insistDays": 1
     }
+}
+或：
+
+{
+    "code": 2,
+    "msg": "用户未达到打卡标准"
 }
 ```
 
-### 
+### 设置打卡状态✅待对接
 
+打卡状态不应该由前端决定，当后端拿到complete为1的record且当前状态为未打卡时，将自动改变打卡状态为待打卡。
 
+<font color = "red">该接口只供前端对接调试阶段使用，不建议在生产环境中使用</font>
+
+```http
+GET /writester/punch/setstate
+```
+
+参数
+
+```json
+openid:on62f4kYUBt-AvuY11BcNNsCE4Ko
+punchState: 1
+```
+
+返回
+
+略 code为0即为成功
 
 ## 我的信息篇
 
@@ -103,6 +166,32 @@ targetPositions:[1,3,4] // 目标岗位，数组
 {
     "code": 0,
     "msg": "成功"
+}
+```
+
+### 获取授权状态✅等待对接
+
+只含有authorized字段
+
+```http
+GET /wechat/getauthstate
+```
+
+参数
+
+```
+openid:osL8-5WbE-o4K8zcurUf6HRRnf54
+```
+
+返回
+
+```json
+{
+    "code": 0,
+    "msg": "成功",
+    "data": {
+        "authorised": 1
+    }
 }
 ```
 
@@ -282,9 +371,31 @@ type: 2  //0企业真题，1专业知识，2为“我的”专用
 }
 ```
 
+### 意见反馈✅ 待对接
+
+```http
+POST /wechat/feedback
+```
+
+参数
+
+```json
+openid:osL8-5WbE-o4K8zcurUf6HRRnf54
+content:阿巴巴
+```
+
+返回
+
+```json
+{
+    "code": 0,
+    "msg": "成功"
+}
+```
+
 ## 题库篇
 
-### 首页搜索
+### 首页搜索✅
 
 ```http
 GET /writester/questionbank/searchqblist
@@ -360,9 +471,57 @@ search: '运营'
 }
 ```
 
-### 热点题库：
+### 热点题库✅
 
 首页热点题库，选取数据库中热度最高的6套子题库
+
+```http
+GET /writester/questionbank/hotpointcqblist
+```
+
+参数
+
+```json
+openid: on62f4kYUBt-AvuY11BcNNsCE4Ko
+```
+
+返回
+
+``` json
+{
+    "code": 0,
+    "msg": "成功",
+    "data": [
+        {
+            "childQbId":"123457",
+          	"questionNumber":30,
+            "title": "主页热点题库1",
+						"heat": 800,
+          	"complete":0,//上次已完成的话是1
+          	"completeNumber": 5, // 直接传数字，做了几道题
+          	"correct": 80,
+            "collectState": 0, //未收藏
+          	"lastMode":0 ,// 上次没做过题
+          	"spentTime":30,
+          	"simulationTime":80 //单位分钟
+        },
+        {
+            "childQbId":"123458",
+          	"questionNumber":20,
+            "title": "主页热点题库2",
+						"heat": 800,
+          	"complete":0,
+          	"completeNumber": 80,
+          	"correct": 80,
+            "collectState": 1 ,//已收藏
+          	"lastMode":1 ,// 上次模拟模式
+          	"spentTime":30,
+          	"simulationTime":80 //单位分钟
+        },
+      .. 一共六条
+    ]
+}
+```
 
 ### 行业和职位列表✅
 
@@ -876,7 +1035,7 @@ mistaken:1 // 当mistaken为1的时候是错题解析，0的时候是全部解�
 }
 ```
 
-### 中途退出子题库or完成题库✅
+### 中途退出子题库or完成题库✅ 新参数thisTimeSpent
 
 示例URL：
 
@@ -891,6 +1050,7 @@ openid: on62f4kYUBt-AvuY11BcNNsCE4Ko //用户的openid
 cqbId: 15881323384921812123 //子题库id
 complete: 0 // 0为未完成 1为已完成
 completeNumber: 2 //已做完的题目个数
+thisTimeSpent: 100// 这次实际消耗的时间
 spentTime:2000 //以秒为单位
 userAnswerList:["A","B","","D"...,"作答题答案"]//用户的作答
 mode: 1 //1模拟模式 2练习模式
@@ -899,8 +1059,6 @@ correct:30 //complete为1时，前端传回这个数据，中途退出时不传�
 ```
 
 后端会根据根据你的complete字段判断你的完成度信息，不用区分**中途退出**和**完成**两个API；
-
-<font color = "red">TODO当complete为1时，后台会根据你的answerList来生成错题本。</font>
 
 **返回**
 

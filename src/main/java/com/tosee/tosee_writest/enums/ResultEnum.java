@@ -9,6 +9,10 @@ public enum ResultEnum
 
     PARAM_ERROR(1, "参数不正确"),
 
+    NOT_UP_TO_CLOCKING_STANDARD(2,"用户未达到打卡标准"),
+
+    ALREADY_CLOCKIN(3,"不可重复打卡"),
+
 
     PQB_NOT_EXIST(10,"主题库不存在"),
 

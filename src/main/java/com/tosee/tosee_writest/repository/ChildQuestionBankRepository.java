@@ -13,7 +13,11 @@ import java.util.List;
  */
 public interface ChildQuestionBankRepository extends JpaRepository<ChildQuestionBank, String>
 {
+    // 首页搜索用
     List<ChildQuestionBank> findByCqbTitleLike(String search);
+
+    // 首页热点题库用
+    List<ChildQuestionBank> findTop6ByOrderByCqbHeatDesc();
 
     List<ChildQuestionBank> findByParentQbIdOrderByCqbHeatDesc(String parentQbId);
 

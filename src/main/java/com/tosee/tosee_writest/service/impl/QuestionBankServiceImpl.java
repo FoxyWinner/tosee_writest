@@ -100,6 +100,12 @@ public class QuestionBankServiceImpl implements QuestionBankService
     }
 
     @Override
+    public List<ChildQuestionBank> findHotPoint6CQBs()
+    {
+        return childQuestionBankRepository.findTop6ByOrderByCqbHeatDesc();
+    }
+
+    @Override
     public List<ParentQuestionBank> findPQBListByPositionTypeAndPqbTypeOrderBy(Integer positionType, Integer pqbType, QuestionBankSortEnum sortRule)
     {
         // 按热度排序

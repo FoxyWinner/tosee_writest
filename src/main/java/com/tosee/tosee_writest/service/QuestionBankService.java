@@ -24,6 +24,15 @@ public interface QuestionBankService
      */
     List<ChildQuestionBank> searchChildQuestionBank(String search);
 
+
+    /**
+     * 查找子题库内热度前6
+     * @return
+     */
+    List<ChildQuestionBank> findHotPoint6CQBs();
+
+
+
     /** 查询主题库列表
      * @param positionType
      * @param pqbType 题库类型
@@ -37,6 +46,7 @@ public interface QuestionBankService
      * @return
      */
     List<ParentQuestionBank> findEPQBListByPositionTypesAndPqbTypeOrderBy(List<Integer> positionTypes, QuestionBankSortEnum sortRule);
+
 
     List<ParentQuestionBank> findEPQBListRecommendedOrderBy(QuestionBankSortEnum sortRule);
 
