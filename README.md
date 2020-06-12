@@ -1,4 +1,4 @@
-#ToseeWritest
+# ToseeWritest
 该项目是参与2020年高校小程序大赛的"笔试一下"微信小程序的服务端程序。
 ## 技术选型
 * MySQL 5.7.25
