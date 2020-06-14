@@ -602,10 +602,10 @@ public ResultVO hotpointcqblist(@RequestParam("openid") String openid)
     {
         // 获取打卡用户条目
         PunchClock punchClock =punchClockService.findByOpenidAndPunchDate(recordForm.getOpenid(),new java.sql.Date(System.currentTimeMillis()));
+        log.info("【打卡记录】punchClock{}",punchClock);
 
         if (punchClock == null)
         {
-            log.info("【做题记录】punchClock{}",punchClock);
             // 新建
             punchClock = new PunchClock();
             punchClock.setPunchId(KeyUtil.genUniqueKey());
@@ -622,15 +622,15 @@ public ResultVO hotpointcqblist(@RequestParam("openid") String openid)
         // 如果是完成，那么记录三项属性（完成数 正确数 ）
         if(recordForm.getComplete() == 1)
         {
-            punchClock.setCompleteNumber(punchClock.getCompleteNumber() + recordForm.getCompleteNumber());
+            ChildQuestionBank childQuestionBank = questionBankService.findCQBById(recordForm.getCqbId());
+            punchClock.setCompleteNumber(punchClock.getCompleteNumber() + childQuestionBank.getQuestionNumber());
             // 由于数据库里没有存储正确题数字段 所以我们先根据正确率来反推该数值 这可能会造成数值上有些偏差
             punchClock.setSolveNumber(punchClock.getSolveNumber() + (recordForm.getCompleteNumber() * recordForm.getCorrect() / 100));
-            // todo 这里用到了新字段 需要跟前端商量
             punchClock.setExerciseTime(punchClock.getExerciseTime() + recordForm.getThisTimeSpent()); // 存的是秒，传给前端打卡数据的时候要转HM
-
+            // 如果状态不是已打卡，那么要置为待打卡状态
             if (punchClock.getPunchState() != PunchStateEnum.ALREADY_CLOCKIN.getCode())
             {
-                // 如果打完卡了那肯定不要置成2
+                // 如果打完卡了那肯定不要置成待打卡
                 punchClock.setPunchState(PunchStateEnum.UP_TO_STANDARD_BUT_NOT_CLOCKIN.getCode());
             }
 
@@ -638,10 +638,10 @@ public ResultVO hotpointcqblist(@RequestParam("openid") String openid)
         // 如果不是完成 是中途退出 那么只记录一项属性：消耗时长
         else
         {
-
-            // todo 这里用到了新字段 需要跟前端商量
             punchClock.setExerciseTime(punchClock.getExerciseTime() + recordForm.getThisTimeSpent()); // 存的是秒，传给前端打卡数据的时候要转HM
         }
+
+        // 无论上面经过怎样的处理，最终肯定要save
         punchClockRepository.save(punchClock);
     }
 

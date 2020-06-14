@@ -5,6 +5,7 @@ import com.tosee.tosee_writest.dataobject.WorkField;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Author: FoxyWinner
@@ -33,6 +34,9 @@ public interface ParentQuestionBankRepository extends JpaRepository<ParentQuesti
 
     // 查询行测父题库列表
     List<ParentQuestionBank> findByPqbTypeAndIsRelaseOrderByPqbHeat(Integer pqbType,Integer isRelase);
+
+    // 查询定制推荐的父题库列表然后转子题库，这里必须是发布的
+    List<ParentQuestionBank> findByPositionTypeInAndIsRelase(Set<Integer> positionTypes,Integer isRelase);
 
 
 }

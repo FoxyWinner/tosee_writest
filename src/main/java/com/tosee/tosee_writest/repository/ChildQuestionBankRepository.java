@@ -28,4 +28,6 @@ public interface ChildQuestionBankRepository extends JpaRepository<ChildQuestion
     Page<ChildQuestionBank> findByParentQbIdOrderByRelaseTime(Pageable pageable , String parentQbId);
 
     Integer countByParentQbId(String parentQbId);
+
+    List<ChildQuestionBank> findByParentQbIdIn(List<String> pqbIds);
 }

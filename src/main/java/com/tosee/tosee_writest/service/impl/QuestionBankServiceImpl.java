@@ -11,7 +11,9 @@ import com.tosee.tosee_writest.enums.QuestionTypeEnum;
 import com.tosee.tosee_writest.enums.ResultEnum;
 import com.tosee.tosee_writest.exception.WritestException;
 import com.tosee.tosee_writest.repository.*;
+import com.tosee.tosee_writest.service.PositionService;
 import com.tosee.tosee_writest.service.QuestionBankService;
+import com.tosee.tosee_writest.utils.String2ListConvertUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @Author: FoxyWinner
@@ -52,6 +51,9 @@ public class QuestionBankServiceImpl implements QuestionBankService
 
     @Autowired
     private CompanyRepository companyRepository;
+
+    @Autowired
+    private PositionService positionService;
 
     @Autowired
     private WorkPositionRepository workPositionRepository;
@@ -161,16 +163,100 @@ public class QuestionBankServiceImpl implements QuestionBankService
         return childQuestionBankRepository.findById(childQbId).orElse(null);
     }
 
-
     /**
-     * 该函数应为按照openid查询给该用户推荐的子题库列表，先暂时传的被编辑点了推荐的子题库
-     * @param openid
+     * 复习推荐页面，若用户信息不全时推荐的默认列表
      * @return
      */
     @Override
-    public List<ChildQuestionBank> findRecommendedCQB(String openid)
+    public List<ChildQuestionBank> recommendCQBListDefault()
     {
         List<ChildQuestionBank> result = childQuestionBankRepository.findByIsRecommendedOrderByCqbHeatDesc(1);
+        return result;
+    }
+
+
+    /**
+     * 该函数应为按照openid查询给该用户推荐的子题库列表，先暂时传的被编辑点了推荐的子题库
+     * @param user
+     * @return
+     */
+    @Override
+    public List<ChildQuestionBank> recommendCQBListByUserTargets(User user)
+    {
+        List<ChildQuestionBank> result = new ArrayList<>();
+
+        // 1. 先拿用户目标行业 岗位
+        List<Integer> targetFieldTypes = String2ListConvertUtil.String2ListInteger(user.getTargetFields());
+        List<Integer> targetPostionTypes = String2ListConvertUtil.String2ListInteger(user.getTargetPositions());
+        if (CollectionUtils.isEmpty(targetFieldTypes))
+        {
+            log.error("【推荐子题库查询】该用户没有查询到该用户的目标行业");
+            return result;
+        }
+        if (CollectionUtils.isEmpty(targetPostionTypes))
+        {
+            log.error("【推荐子题库查询】该用户没有查询到该用户的目标岗位");
+            return result;
+        }
+
+        // 2. 转换为实际岗位
+
+        Set<Integer> retrievablePositionTypes = positionService.convertRetrievablePositionTypes(targetFieldTypes,targetPostionTypes);
+        if (CollectionUtils.isEmpty(retrievablePositionTypes))
+        {
+            log.error("【推荐子题库查询】根据用户的意向岗位，没有查到可检索的对应岗位");
+            return result;
+        }
+//        log.info("【推荐子题库查询】可检索岗位{}",retrievablePositionTypes);
+
+
+        // 3. 根据实际岗位查找主题库
+        List<ParentQuestionBank> parentQuestionBanks = parentQuestionBankRepository.findByPositionTypeInAndIsRelase(retrievablePositionTypes,1);
+        if (CollectionUtils.isEmpty(parentQuestionBanks))
+        {
+            log.error("【推荐子题库查询】根据用户的意向岗位，没有查到有主题库对应这些岗位");
+            return result;
+        }
+        List<String> pqbIds = new ArrayList<>();
+        for (ParentQuestionBank parentQuestionBank : parentQuestionBanks)
+        {
+//            log.info("【推荐子题库查询】查询到主题库{}",parentQuestionBank.getPqbTitle());
+            pqbIds.add(parentQuestionBank.getParentQbId());
+        }
+
+        // 4. 将主题库中子题库取出
+        result = childQuestionBankRepository.findByParentQbIdIn(pqbIds);
+
+//        log.info("【推荐子题库查询】最终子题库{}",result);
+        if (CollectionUtils.isEmpty(result))
+            log.error("【推荐子题库查询】没有找到父题库对应的子题库（可能是空的主题库）");
+
+        // 5. 如果题目子题库数量大于6，则随机抽选6个
+        if(result.size() > 6)
+        {
+            Random randomId = new Random();
+            //对随机的6个对象排成原来的默认顺序
+            List<Integer> indexes = new ArrayList<>();
+            while(indexes.size() < 6)
+            {
+                //对象在list里的位置
+                int index = randomId.nextInt(result.size());
+                if(!indexes.contains(index)) {
+                    indexes.add(index);
+                }
+            }
+            //对indexes排序
+            Collections.sort(indexes);
+            //取出indexes对应的list放到newList
+            List<ChildQuestionBank> newList = new ArrayList<>();
+            for(int index : indexes)
+            {
+                newList.add(result.get(index));
+            }
+            result.clear();
+            result.addAll(newList);
+        }
+
         return result;
     }
 

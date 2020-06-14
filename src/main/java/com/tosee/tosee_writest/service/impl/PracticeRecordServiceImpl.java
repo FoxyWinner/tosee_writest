@@ -59,8 +59,7 @@ public class PracticeRecordServiceImpl implements PracticeRecordService
             practiceRecord.setCorrectRatio(practiceRecordDTO.getCorrectRatio());
             practiceRecord.setLastMode(practiceRecordDTO.getLastMode());
 
-            // TODO surpassRatio怎么运算
-            practiceRecord.setSurpassRatio(0);
+            practiceRecord.setSurpassRatio(practiceRecordDTO.getSurpassRatio());
 
             practiceRecordRepository.save(practiceRecord);
         }

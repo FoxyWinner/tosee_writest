@@ -12,4 +12,6 @@ import java.util.List;
 public interface WorkFieldRepository extends JpaRepository<WorkField, Integer>
 {
     WorkField findByFieldType(Integer fieldType);
+
+    List<WorkField> findByFieldTypeIn(List<Integer> fieldTypes);
 }

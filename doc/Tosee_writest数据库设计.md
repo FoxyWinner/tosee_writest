@@ -49,6 +49,36 @@ create table `user`(
 );
 ```
 
+### 管理员表✅
+
+```mysql
+create table `manager_info`(
+  
+  /* 用户ID */
+
+  `manager_id` varchar(32) not null,
+  
+  `username` varchar(32) not null,
+  
+  `password` varchar(32) not null comment '待扩展字段',
+  
+  `openid` varchar(64) not null comment '微信openid',
+  
+
+  /* 时间戳 */
+
+  `create_time` timestamp not null default current_timestamp comment '创建时间',
+
+  `update_time`  timestamp not null default current_timestamp on update current_timestamp comment '修改时间',
+  
+  primary key (`manager_id`) 
+);
+```
+
+### 
+
+
+
 ### 打卡表✅
 
 一天一条记录比较好

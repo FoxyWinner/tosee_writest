@@ -60,7 +60,9 @@ public interface QuestionBankService
 
     ChildQuestionBank findCQBById(String childQbId);
 
-    List<ChildQuestionBank> findRecommendedCQB(String openid);
+    List<ChildQuestionBank> recommendCQBListDefault();
+
+    List<ChildQuestionBank> recommendCQBListByUserTargets(User user);
 
     /** 根据子题库ID 查询题目列表 */
     List<QuestionDTO> findQuestionListByCQBId(String childQbId);

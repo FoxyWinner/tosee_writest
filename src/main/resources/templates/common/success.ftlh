@@ -15,13 +15,13 @@
 <#--                    拿不到的话就是空字符-->
                 </h4> <strong>${msg!""}</strong>
                 <br>
-                <a href="${url}" class="alert-link">3s后自动跳转</a>
+                <a href="${url}" class="alert-link">2s后自动跳转</a>
             </div>
         </div>
     </div>
 </div>
 </body>
 <script>
-    setTimeout('location.href="${url}"',3000);
+    setTimeout('location.href="${url}"',2000);
 </script>
 </html>

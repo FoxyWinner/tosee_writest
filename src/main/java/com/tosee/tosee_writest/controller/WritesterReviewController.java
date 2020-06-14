@@ -7,6 +7,7 @@ import com.tosee.tosee_writest.dto.PracticeRecordDTO;
 import com.tosee.tosee_writest.dto.QuestionDTO;
 import com.tosee.tosee_writest.enums.*;
 import com.tosee.tosee_writest.exception.WritestException;
+import com.tosee.tosee_writest.repository.UserRepository;
 import com.tosee.tosee_writest.service.*;
 import com.tosee.tosee_writest.utils.ResultVOUtil;
 import com.tosee.tosee_writest.vo.*;
@@ -44,6 +45,11 @@ public class WritesterReviewController
 
     @Autowired
     private PracticeRecordService practiceRecordService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+
     @GetMapping("/mistakebooklist")
     public ResultVO mistakeBookList(@RequestParam("openid") String openid,
                                     @RequestParam(value = "page",defaultValue = "0") Integer page,
@@ -220,7 +226,7 @@ public class WritesterReviewController
     }
 
     /**
-     * todo 待重构 重构成根据用户信息推荐。如果用户未填写岗位信息，就目前这个就行
+     * 根据用户信息推荐。如果用户未填写岗位信息，就推荐默认推荐列表（子题库被置推荐标记的）
      * @param openid
      * @return
      */
@@ -232,15 +238,39 @@ public class WritesterReviewController
             log.error("【复习推荐】openid为空");
             throw new WritestException(ResultEnum.PARAM_ERROR);
         }
-
         List<ChildQuestionBankVO> result = new ArrayList<>();
 
-        // 1. 拿到推荐子题库列表
-        ParentQuestionBank parentQuestionBank = new ParentQuestionBank();
-        List<ChildQuestionBank> childQuestionBankList = questionBankService.findRecommendedCQB(openid);
-        result = this.convertToChildQuestionBankVOList(childQuestionBankList,openid);
 
-        return ResultVOUtil.success(result);
+        User user = userRepository.findByOpenid(openid);
+        // 几种情况：
+        // 1. 查不到该用户信息
+        if (user == null)
+        {
+            // 直接返回默认推荐
+            log.info("【复习推荐】查不到用户信息，返回默认列表");
+            List<ChildQuestionBank> childQuestionBankList = questionBankService.recommendCQBListDefault();
+            result = this.convertToChildQuestionBankVOList(childQuestionBankList,openid);
+            return ResultVOUtil.success(result);
+        }
+        // 这是个容错处理，user不为null但targetPostions为空的情况其实不应该发生
+        else if (StringUtils.isEmpty(user.getTargetPositions()))
+        {
+            log.error("【复习推荐】该页面走入了一个不该出现的分支，数据库里有user信息，但目标岗位为空");
+            List<ChildQuestionBank> childQuestionBankList = questionBankService.recommendCQBListDefault();
+            result = this.convertToChildQuestionBankVOList(childQuestionBankList,openid);
+            return ResultVOUtil.success(result);
+        }
+        else
+        {
+            List<ChildQuestionBank> childQuestionBankList = questionBankService.recommendCQBListByUserTargets(user);
+
+            // 由于题目数量限制 现在的根据岗位的推荐结果可能为空 这时候要用默认推荐列表代替
+            if (CollectionUtils.isEmpty(childQuestionBankList))
+                childQuestionBankList = questionBankService.recommendCQBListDefault();
+            result = this.convertToChildQuestionBankVOList(childQuestionBankList,openid);
+            return ResultVOUtil.success(result);
+        }
+
     }
 
     @GetMapping("/collectlist")

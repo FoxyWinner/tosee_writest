@@ -130,6 +130,7 @@ public class OperatorQuestionBankController
                 parentQuestionBank = questionBankService.findOneParentQuestionBank(form.getParentQbId());
             } else
             {
+                parentQuestionBank.setIsRelase(0);
                 parentQuestionBank.setCqbNumber(0);
                 form.setParentQbId(KeyUtil.genUniqueKey());
             }
@@ -137,6 +138,8 @@ public class OperatorQuestionBankController
 
             if(form.getIsRecommended()) parentQuestionBank.setIsRecommended(1);
             else parentQuestionBank.setIsRecommended(0);
+
+
 
             log.info("【父题库保存】{}",parentQuestionBank);
 
@@ -328,6 +331,12 @@ public class OperatorQuestionBankController
         return new ModelAndView("question/index", map);
     }
 
+    /**
+     * todo 这个方法被弃用了
+     * @param questionId
+     * @param map
+     * @return
+     */
     @GetMapping("questionindextest")
     public ModelAndView questionIndexTest(@RequestParam(value = "questionId", required = false) String questionId,
                                       Map<String, Object> map)
@@ -372,6 +381,9 @@ public class OperatorQuestionBankController
             {
                 // 是更改题目
                 questionDTO = questionBankService.findQuestionById(form.getQuestionId());
+
+                map.put("msg", "返回子题库列表");
+                map.put("url", "/toseewritest/operator/questionbank/questionlist?childQbId="+questionDTO.getChildQbId());
             } else
             {
                 // 是新增题目
@@ -379,27 +391,35 @@ public class OperatorQuestionBankController
                 // 题号
                 Integer questionSeq = questionBankService.getQuestionNumber(form.getChildQbId()) + 1;
                 questionDTO.setQuestionSeq(questionSeq);
+
+                // 跳转继续新增
+                map.put("msg", "将继续为该子题库添加题目");
+                map.put("url", "/toseewritest/operator/questionbank/questionindex?lastChildQbId="+questionDTO.getChildQbId());
             }
 
             BeanUtils.copyProperties(form, questionDTO);
 
 
             // 将form中的questionOptions字符串转为对象List，并存入questionDTO中。
-            GsonBuilder gsonBuilder = new GsonBuilder();
-            gsonBuilder.setPrettyPrinting();
-            Gson gson = gsonBuilder.create();
-            List<QuestionOption> questionOptionList = gson.fromJson(form.getQuestionOptions(),  new TypeToken<List<QuestionOption>>(){}.getType());
+            if (form.getQuestionType() != QuestionTypeEnum.ESSAY_QUESTION.getCode())
+            {
+                GsonBuilder gsonBuilder = new GsonBuilder();
+                gsonBuilder.setPrettyPrinting();
+                Gson gson = gsonBuilder.create();
+                List<QuestionOption> questionOptionList = gson.fromJson(form.getQuestionOptions(),  new TypeToken<List<QuestionOption>>(){}.getType());
 
 //            log.info("【选项列表】{}",questionOptionList);
-            for (QuestionOption questionOption : questionOptionList)
-            {
-                if (questionOption.getOptionId() == null || questionOption.getOptionId().isEmpty())
-                    questionOption.setOptionId(KeyUtil.genUniqueKey());
-                if (questionOption.getQuestionId() == null || questionOption.getQuestionId().isEmpty())
-                    questionOption.setQuestionId(questionDTO.getQuestionId());
+                for (QuestionOption questionOption : questionOptionList)
+                {
+                    if (questionOption.getOptionId() == null || questionOption.getOptionId().isEmpty())
+                        questionOption.setOptionId(KeyUtil.genUniqueKey());
+                    if (questionOption.getQuestionId() == null || questionOption.getQuestionId().isEmpty())
+                        questionOption.setQuestionId(questionDTO.getQuestionId());
+                }
+
+                questionDTO.setQuestionOptions(questionOptionList);
             }
 
-            questionDTO.setQuestionOptions(questionOptionList);
             log.info("【题目保存】{}",questionDTO);
 
 
@@ -412,12 +432,17 @@ public class OperatorQuestionBankController
             return new ModelAndView("common/error", map);
         }
 
-        map.put("msg", "将继续为该子题库添加题目");
-        map.put("url", "/toseewritest/operator/questionbank/questionindex?lastChildQbId="+questionDTO.getChildQbId());
+
         return new ModelAndView("common/success", map);
     }
 
 
+    /**
+     * todo 这个方法被弃用了
+     * @param form
+     * @param bindingResult
+     * @return
+     */
     @PostMapping("questionsaveajax")
     public ResultVO questionSaveAjax(@Valid QuestionForm form,
                                      BindingResult bindingResult)

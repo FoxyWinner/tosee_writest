@@ -4,6 +4,7 @@ import com.tosee.tosee_writest.dataobject.WorkField;
 import com.tosee.tosee_writest.dataobject.WorkPosition;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Author: FoxyWinner
@@ -22,4 +23,6 @@ public interface PositionService
     WorkField findFieldByType(Integer fieldType);
 
     WorkPosition findPositionByType(Integer positionType);
+
+    Set<Integer> convertRetrievablePositionTypes(List<Integer> targetFieldTypes, List<Integer> targetPostionTypes);
 }

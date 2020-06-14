@@ -13,9 +13,13 @@ public interface WorkPositionRepository extends JpaRepository<WorkPosition, Inte
 {
     List<WorkPosition> findByPositionNameLike(String search);
 
+    List<WorkPosition> findByPositionTypeIn(List<Integer> positionTypes);
+
     List<WorkPosition> findByFieldTypeAndPqbType(Integer fieldType,Integer pqbType);
 
     List<WorkPosition> findByPqbType(Integer pqbType);
 
     WorkPosition findByPositionType(Integer positionType);
+
+    List<WorkPosition> findByFieldTypeAndPqbTypeInAndPositionNameLike(Integer fieldType, List<Integer> positionTypes, String nameLike);
 }
