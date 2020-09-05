@@ -80,7 +80,9 @@ public class QuestionBankServiceImpl implements QuestionBankService
         {
             List<ChildQuestionBank> childQuestionBanks = this.findCQBListByPQBIdOrderBy(parentQuestionBank.getParentQbId(),QuestionBankSortEnum.SORT_BY_HEAT_DESC);
             for (ChildQuestionBank childQuestionBank : childQuestionBanks)
+            {
                 cqbIdsSet.add(childQuestionBank.getChildQbId());
+            }
         }
 
 
@@ -88,12 +90,16 @@ public class QuestionBankServiceImpl implements QuestionBankService
         // 子题库名搜索
         List<ChildQuestionBank> childQuestionBanksSearched = childQuestionBankRepository.findByCqbTitleLike("%"+search+"%");
         for (ChildQuestionBank childQuestionBank : childQuestionBanksSearched)
+        {
             cqbIdsSet.add(childQuestionBank.getChildQbId());
+        }
 
         // 题库题干搜索
         List<Question> questionsSearched = questionRepository.findByQuestionStemLike("%"+search+"%");
         for (Question question : questionsSearched)
+        {
             cqbIdsSet.add(question.getChildQbId());
+        }
 
 
 
@@ -116,7 +122,10 @@ public class QuestionBankServiceImpl implements QuestionBankService
             return parentQuestionBankRepository.findByPositionTypeAndPqbTypeAndIsRelaseOrderByPqbHeatDesc(positionType,pqbType,1);
 
         }
-        else return parentQuestionBankRepository.findByPositionTypeAndPqbTypeAndIsRelaseOrderByRelaseTimeDesc(positionType,pqbType,1);
+        else
+        {
+            return parentQuestionBankRepository.findByPositionTypeAndPqbTypeAndIsRelaseOrderByRelaseTimeDesc(positionType,pqbType,1);
+        }
     }
 
     @Override
@@ -299,7 +308,7 @@ public class QuestionBankServiceImpl implements QuestionBankService
         {
             result = Question2QuestionDTOConverter.convert(question);
 
-            if(result.getQuestionType()!= QuestionTypeEnum.ESSAY_QUESTION.getCode())
+            if(result.getQuestionType() != QuestionTypeEnum.ESSAY_QUESTION.getCode())
             {
                 List<QuestionOption> questionOptions = questionOptionRepository.findByQuestionIdOrderByOptionNameAsc(result.getQuestionId());
 

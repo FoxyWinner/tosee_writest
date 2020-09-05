@@ -42,10 +42,12 @@ public class UserServiceImpl implements UserService
         if(user == null)
         {
             user = new User();
-            BeanUtils.copyProperties(userDTO,user);
+            BeanUtils.copyProperties(userDTO,user,this.getNullPropertyNames(userDTO));
             user.setUserId(KeyUtil.genUniqueKey());
-            user.setTargetFields(userDTO.getTargetFields().toString());
-            user.setTargetPositions(userDTO.getTargetPositions().toString());
+            if (userDTO.getTargetFields() != null)
+                user.setTargetFields(userDTO.getTargetFields().toString());
+            if (userDTO.getTargetPositions() != null)
+                user.setTargetPositions(userDTO.getTargetPositions().toString());
         }
         else
         {

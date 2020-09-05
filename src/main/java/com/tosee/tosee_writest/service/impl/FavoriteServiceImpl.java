@@ -83,6 +83,7 @@ public class FavoriteServiceImpl implements FavoriteService
     }
 
     @Override
+    @Transactional
     public void addFavorite(String openid, Integer favoriteType, String targetId)
     {
         if(favoriteType!= FavoriteTypeEnum.QUESTION.getCode())
@@ -96,11 +97,11 @@ public class FavoriteServiceImpl implements FavoriteService
         }
         else // 收藏题目时
         {
-            String childQbId = questionBankService.findQuestionById(targetId).getChildQbId();
+            String childQbId = questionBankService.findQuestionById(targetId).getChildQbId().trim();
             CollectBook collectBook = collectBookRepository.findByOpenidAndCqbId(openid,childQbId);
 
             if (collectBook == null) collectBook = this.initACollectBook(openid,childQbId);
-            collectBook = this.addCollectQuestion(targetId,collectBook);
+            else collectBook = this.addCollectQuestion(targetId,collectBook);
 
             // 存储favorite，先看存不存在这条favorite 如果存在的话不做新增
             if(!favoriteRepository.existsByOpenidAndFavoriteTypeAndTargetId(openid,favoriteType,collectBook.getCollectBookId()))

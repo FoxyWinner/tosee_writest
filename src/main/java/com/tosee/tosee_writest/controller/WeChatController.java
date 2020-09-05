@@ -205,27 +205,31 @@ public class WeChatController
     {
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(userDTO,userVO);
-        userVO.setEduDegree(EnumUtil.getByCode(userDTO.getEduDegree(),UserEduDegreeEnum.class).getMessage());
-        userVO.setGender(EnumUtil.getByCode(userDTO.getGender(), UserGenderEnum.class).getMessage());
+        if (userDTO.getEduDegree() != null)
+            userVO.setEduDegree(EnumUtil.getByCode(userDTO.getEduDegree(),UserEduDegreeEnum.class).getMessage());
+        if (userDTO.getGender() != null)
+            userVO.setGender(EnumUtil.getByCode(userDTO.getGender(), UserGenderEnum.class).getMessage());
 
         List<WorkFieldVO> workFieldVOS = new ArrayList<>();
         List<WorkPostionVO> workPostionVOS = new ArrayList<>();
 
-        for (Integer fieldType : userDTO.getTargetFields())
-        {
-            WorkFieldVO workFieldVO = new WorkFieldVO();
-            WorkField workField = positionService.findFieldByType(fieldType);
-            BeanUtils.copyProperties(workField, workFieldVO);
-            workFieldVOS.add(workFieldVO);
-        }
+        if (userDTO.getTargetFields() != null)
+            for (Integer fieldType : userDTO.getTargetFields())
+            {
+                WorkFieldVO workFieldVO = new WorkFieldVO();
+                WorkField workField = positionService.findFieldByType(fieldType);
+                BeanUtils.copyProperties(workField, workFieldVO);
+                workFieldVOS.add(workFieldVO);
+            }
 
-        for (Integer positionType : userDTO.getTargetPositions())
-        {
-            WorkPostionVO workPostionVO = new WorkPostionVO();
-            WorkPosition workPosition = positionService.findPositionByType(positionType);
-            BeanUtils.copyProperties(workPosition, workPostionVO);
-            workPostionVOS.add(workPostionVO);
-        }
+        if (userDTO.getTargetPositions() != null)
+            for (Integer positionType : userDTO.getTargetPositions())
+            {
+                WorkPostionVO workPostionVO = new WorkPostionVO();
+                WorkPosition workPosition = positionService.findPositionByType(positionType);
+                BeanUtils.copyProperties(workPosition, workPostionVO);
+                workPostionVOS.add(workPostionVO);
+            }
 
         userVO.setTargetFields(workFieldVOS);
         userVO.setTargetPositions(workPostionVOS);
@@ -240,21 +244,29 @@ public class WeChatController
         List<String> workFieldVOS = new ArrayList<>();
         List<String> workPostionVOS = new ArrayList<>();
 
-        for (Integer fieldType : userDTO.getTargetFields())
-        {
-            WorkFieldVO workFieldVO = new WorkFieldVO();
-            WorkField workField = positionService.findFieldByType(fieldType);
-            BeanUtils.copyProperties(workField, workFieldVO);
-            workFieldVOS.add(workFieldVO.getFieldName());
-        }
+        if (userDTO.getTargetFields() != null)
+            for (Integer fieldType : userDTO.getTargetFields())
+            {
+                WorkFieldVO workFieldVO = new WorkFieldVO();
+                WorkField workField = positionService.findFieldByType(fieldType);
+                if (workField != null)
+                {
+                    BeanUtils.copyProperties(workField, workFieldVO);
+                    workFieldVOS.add(workFieldVO.getFieldName());
+                }
+            }
 
-        for (Integer positionType : userDTO.getTargetPositions())
-        {
-            WorkPostionVO workPostionVO = new WorkPostionVO();
-            WorkPosition workPosition = positionService.findPositionByType(positionType);
-            BeanUtils.copyProperties(workPosition, workPostionVO);
-            workPostionVOS.add(workPostionVO.getPositionName());
-        }
+        if (userDTO.getTargetPositions() != null)
+            for (Integer positionType : userDTO.getTargetPositions())
+            {
+                WorkPostionVO workPostionVO = new WorkPostionVO();
+                WorkPosition workPosition = positionService.findPositionByType(positionType);
+                if (workPosition != null)
+                {
+                    BeanUtils.copyProperties(workPosition, workPostionVO);
+                    workPostionVOS.add(workPostionVO.getPositionName());
+                }
+            }
 
         miniUserInfoVO.setTargetFields(workFieldVOS);
         miniUserInfoVO.setTargetPositions(workPostionVOS);

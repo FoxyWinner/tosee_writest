@@ -93,6 +93,7 @@ public class OperatorExperienceController
                                 Map<String, Object> map)
     {
         if (bindingResult.hasErrors()) {
+            log.info("【文章保存FORM】{}",form);
             map.put("msg", bindingResult.getFieldError().getDefaultMessage());
             map.put("url", "/toseewritest/operator/experience/articleindex");
             return new ModelAndView("common/error", map);

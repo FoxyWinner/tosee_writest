@@ -25,8 +25,10 @@ public class User2UserDTOConverter
         UserDTO userDTO = new UserDTO();
         BeanUtils.copyProperties(user,userDTO);
 
-        userDTO.setTargetFields(String2ListConvertUtil.String2ListInteger(user.getTargetFields()));
-        userDTO.setTargetPositions(String2ListConvertUtil.String2ListInteger(user.getTargetPositions()));
+        if (user.getTargetFields()!= null)
+            userDTO.setTargetFields(String2ListConvertUtil.String2ListInteger(user.getTargetFields()));
+        if (user.getTargetPositions() != null)
+            userDTO.setTargetPositions(String2ListConvertUtil.String2ListInteger(user.getTargetPositions()));
 
         return userDTO;
     }

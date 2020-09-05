@@ -66,7 +66,7 @@
 
                         <div class="form-group">
                             <label>浏览数</label>
-                            <input name="readerNumber" type="text" class="form-control"  value="${(experienceArticle.readerNumber?c)!'0'}" data-error="浏览数必填" required/>
+                            <input name="readerNumber" type="text" class="form-control"  value="${(experienceArticle.readerNumber?c)!0}" data-error="浏览数必填" required/>
                             <div class="help-block with-errors"></div>
                         </div>
 
@@ -161,6 +161,7 @@
         });
 
         var index = layedit.build('content', {
+            height: 600,
             tool: [  'strong','italic','underline','del','|','left','center','right','link','unlink','image']
         });
 

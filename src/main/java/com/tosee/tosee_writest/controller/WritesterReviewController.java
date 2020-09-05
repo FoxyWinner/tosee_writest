@@ -109,38 +109,42 @@ public class WritesterReviewController
 
         // 在DTO中的mistakeList已经是按照UpdateTime排列好的
         int mistakeSeq = 1;
-        for (Mistake mistake : mistakeBookDTO.getMistakeList())
+        if (!CollectionUtils.isEmpty(mistakeBookDTO.getMistakeList()))
         {
-            //将mistake转换为一个个的mistakeVO，添加进result
-            MistakeVO mistakeVO = new MistakeVO();
-            BeanUtils.copyProperties(mistake,mistakeVO);
-            // mistakeSeq,questionType,questionStem,questionOptionVOList,answer,explanation,collectState
-
-            QuestionDTO questionDTO = questionBankService.findQuestionById(mistakeVO.getQuestionId());
-            QuestionVO questionVO = new QuestionVO();
-            BeanUtils.copyProperties(questionDTO,questionVO);
-            List<QuestionOptionVO> questionOptionVOList = new ArrayList<>();
-
-            if(questionDTO.getQuestionOptions() != null)
+            for (Mistake mistake : mistakeBookDTO.getMistakeList())
             {
-                for (QuestionOption questionOption : questionDTO.getQuestionOptions())
-                {
-                    QuestionOptionVO questionOptionVO = new QuestionOptionVO();
-                    BeanUtils.copyProperties(questionOption,questionOptionVO);
-                    questionOptionVOList.add(questionOptionVO);
-                }
-                questionVO.setQuestionOptionVOList(questionOptionVOList);
+                //将mistake转换为一个个的mistakeVO，添加进result
+                MistakeVO mistakeVO = new MistakeVO();
+                BeanUtils.copyProperties(mistake,mistakeVO);
+                // mistakeSeq,questionType,questionStem,questionOptionVOList,answer,explanation,collectState
 
+                QuestionDTO questionDTO = questionBankService.findQuestionById(mistakeVO.getQuestionId());
+                QuestionVO questionVO = new QuestionVO();
+                BeanUtils.copyProperties(questionDTO,questionVO);
+                List<QuestionOptionVO> questionOptionVOList = new ArrayList<>();
+
+                if(questionDTO.getQuestionOptions() != null)
+                {
+                    for (QuestionOption questionOption : questionDTO.getQuestionOptions())
+                    {
+                        QuestionOptionVO questionOptionVO = new QuestionOptionVO();
+                        BeanUtils.copyProperties(questionOption,questionOptionVO);
+                        questionOptionVOList.add(questionOptionVO);
+                    }
+                    questionVO.setQuestionOptionVOList(questionOptionVOList);
+
+                }
+
+                // 填入收藏状态
+                questionVO.setCollectState(favoriteService.findByOpenidAndFavoriteTypeAndTargetId(openid, FavoriteTypeEnum.QUESTION.getCode(),questionVO.getQuestionId()));
+
+                BeanUtils.copyProperties(questionVO,mistakeVO);
+                mistakeVO.setMistakeSeq(mistakeSeq);// 按错题UpdateTime排列题号
+                mistakeSeq++;
+
+                result.add(mistakeVO);
             }
 
-            // 填入收藏状态
-            questionVO.setCollectState(favoriteService.findByOpenidAndFavoriteTypeAndTargetId(openid, FavoriteTypeEnum.QUESTION.getCode(),questionVO.getQuestionId()));
-
-            BeanUtils.copyProperties(questionVO,mistakeVO);
-            mistakeVO.setMistakeSeq(mistakeSeq);// 按错题UpdateTime排列题号
-            mistakeSeq++;
-
-            result.add(mistakeVO);
         }
 
         return ResultVOUtil.success(result);
@@ -384,39 +388,43 @@ public class WritesterReviewController
 
         // 在DTO中的collectQuestionList已经是按照UpdateTime排列好的
         int collectQuestionSeq = 1;
-        for (CollectQuestion collectQuestion : collectBookDTO.getCollectQuestionList())
+        if (!CollectionUtils.isEmpty(collectBookDTO.getCollectQuestionList()))
         {
-            //将mistake转换为一个个的mistakeVO，添加进result
-            CollectQuestionVO collectQuestionVO = new CollectQuestionVO();
-            BeanUtils.copyProperties(collectQuestion,collectQuestionVO);
-
-            QuestionDTO questionDTO = questionBankService.findQuestionById(collectQuestionVO.getQuestionId());
-            QuestionVO questionVO = new QuestionVO();
-            BeanUtils.copyProperties(questionDTO,questionVO);
-
-            List<QuestionOptionVO> questionOptionVOList = new ArrayList<>();
-
-            if(questionDTO.getQuestionOptions() != null)
+            for (CollectQuestion collectQuestion : collectBookDTO.getCollectQuestionList())
             {
-                for (QuestionOption questionOption : questionDTO.getQuestionOptions())
+                //将mistake转换为一个个的mistakeVO，添加进result
+                CollectQuestionVO collectQuestionVO = new CollectQuestionVO();
+                BeanUtils.copyProperties(collectQuestion,collectQuestionVO);
+
+                QuestionDTO questionDTO = questionBankService.findQuestionById(collectQuestionVO.getQuestionId());
+                QuestionVO questionVO = new QuestionVO();
+                BeanUtils.copyProperties(questionDTO,questionVO);
+
+                List<QuestionOptionVO> questionOptionVOList = new ArrayList<>();
+
+                if(questionDTO.getQuestionOptions() != null)
                 {
-                    QuestionOptionVO questionOptionVO = new QuestionOptionVO();
-                    BeanUtils.copyProperties(questionOption,questionOptionVO);
-                    questionOptionVOList.add(questionOptionVO);
+                    for (QuestionOption questionOption : questionDTO.getQuestionOptions())
+                    {
+                        QuestionOptionVO questionOptionVO = new QuestionOptionVO();
+                        BeanUtils.copyProperties(questionOption,questionOptionVO);
+                        questionOptionVOList.add(questionOptionVO);
+                    }
+                    questionVO.setQuestionOptionVOList(questionOptionVOList);
+
                 }
-                questionVO.setQuestionOptionVOList(questionOptionVOList);
 
+                // 填入收藏状态
+                questionVO.setCollectState(favoriteService.findByOpenidAndFavoriteTypeAndTargetId(openid, FavoriteTypeEnum.QUESTION.getCode(),questionVO.getQuestionId()));
+
+                BeanUtils.copyProperties(questionVO,collectQuestionVO);
+                collectQuestionVO.setCollectQuestionSeq(collectQuestionSeq);// 按错题UpdateTime排列题号
+                collectQuestionSeq++;
+
+                result.add(collectQuestionVO);
             }
-
-            // 填入收藏状态
-            questionVO.setCollectState(favoriteService.findByOpenidAndFavoriteTypeAndTargetId(openid, FavoriteTypeEnum.QUESTION.getCode(),questionVO.getQuestionId()));
-
-            BeanUtils.copyProperties(questionVO,collectQuestionVO);
-            collectQuestionVO.setCollectQuestionSeq(collectQuestionSeq);// 按错题UpdateTime排列题号
-            collectQuestionSeq++;
-
-            result.add(collectQuestionVO);
         }
+
 
         return ResultVOUtil.success(result);
     }

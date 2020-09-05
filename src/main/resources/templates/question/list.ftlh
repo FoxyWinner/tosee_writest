@@ -73,7 +73,7 @@
                                 <div class="list-group-item">
                                     <span class="badge">答案</span> ${questionDTO.answer}
                                 </div>
-                                <div class="list-group-item"> <span class="badge">解析</span> ${questionDTO.explanation}</div>
+                                <div class="list-group-item"> <span class="badge">解析</span> ${questionDTO.explanation?no_esc}</div>
 
                                 <div class="list-group-item">
                                     <a class="btn btn-default" href="/toseewritest/operator/questionbank/questionindex?questionId=${questionDTO.questionId}" >修改</a>

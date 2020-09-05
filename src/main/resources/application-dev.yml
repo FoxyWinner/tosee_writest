@@ -30,6 +30,9 @@ wechat:
 server:
   servlet:
     context-path: /toseewritest  #prefix
+  tomcat:
+    max-http-form-post-size: -1
+  max-http-header-size: 16384
 
 ftp:
   server: 152.136.232.126

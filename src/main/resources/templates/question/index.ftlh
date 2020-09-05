@@ -56,7 +56,7 @@
                             <p class="help-block" id="options-help-block">
                                 题干可以暂时为空，但不建议输入题干为空的题目。
                             </p>
-                            <textarea name="questionStem" id="content" class="form-control" rows="20" onchange="">${(questionDTO.questionStem)!''}</textarea>
+                            <textarea name="questionStem" id="questionStem" class="form-control" rows="20" onchange="">${(questionDTO.questionStem)!''}</textarea>
                             <div class="help-block with-errors"></div>
                         </div>
 
@@ -67,8 +67,15 @@
                         </div>
 
                         <div class="form-group">
+<#--                            <label>解析</label>-->
+<#--                            <input name="explanation" type="text" class="form-control" data-error="答案必填" required value="${(questionDTO.explanation)!''}"/>-->
+<#--                            <div class="help-block with-errors"></div>-->
+
                             <label>解析</label>
-                            <input name="explanation" type="text" class="form-control" data-error="答案必填" required value="${(questionDTO.explanation)!''}"/>
+                            <p class="help-block" id="options-help-block">
+                                解析可以暂时为空，但不建议输入解析为空的题目。
+                            </p>
+                            <textarea name="explanation" id="explanation" class="form-control" rows="20" onchange="">${(questionDTO.explanation)!''}</textarea>
                             <div class="help-block with-errors"></div>
                         </div>
 
@@ -132,7 +139,11 @@
             }
         });
 
-        var index = layedit.build('content', {
+        var questionStemEditor = layedit.build('questionStem', {
+            tool: [  'strong','italic','underline','del','|','left','center','right','link','unlink','image']
+        });
+
+        var explanationEditor = layedit.build('explanation', {
             tool: [  'strong','italic','underline','del','|','left','center','right','link','unlink','image']
         });
 

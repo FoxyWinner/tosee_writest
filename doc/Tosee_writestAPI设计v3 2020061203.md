@@ -18,7 +18,7 @@ https://toseewritest.mynatapp.cc//toseewritest/wechat/auth?code=123456
 
 ## 打卡每日一练篇
 
-### 查看打卡状态✅ 待对接
+### 查看打卡状态✅ 
 
 ```http
 GET /writester/punch/getstate
@@ -46,7 +46,7 @@ openid: on62f4kYUBt-AvuY11BcNNsCE4Ko
 }
 ```
 
-### 打卡✅ 待对接
+### 打卡✅ 
 
 打卡的时候直接调用该接口，只要code为0就说明打卡成功了。
 
@@ -91,7 +91,7 @@ openid:on62f4kYUBt-AvuY11BcNNsCE4Ko
 }
 ```
 
-### 设置打卡状态✅待对接
+### 设置打卡状态✅
 
 打卡状态不应该由前端决定，当后端拿到complete为1的record且当前状态为未打卡时，将自动改变打卡状态为待打卡。
 
