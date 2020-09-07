@@ -597,3 +597,33 @@ create table `practice_record`(
 );
 ```
 
+## 七、出校篇
+
+### 出校记录
+
+```mysql
+create table `pass_record`(
+  /* ID */
+  `record_id` varchar(32) not null,
+  
+  /* 记录信息 */
+  `name` varchar(32) not null comment '姓名',
+  
+  `institute` varchar(128) not null comment '学院名',
+  
+  `state`  varchar(32) not null comment '状态',
+
+ 	`student_number` varchar(32) not null comment '学号',
+  
+  `time` varchar(64) not null comment '时间',
+  
+  
+  /* 时间戳 */
+  `create_time` timestamp not null default current_timestamp comment '创建时间',
+  `update_time`  timestamp not null default current_timestamp on update current_timestamp comment '修改时间',
+  
+	primary key (`record_id`)
+);
+```
+
+## 

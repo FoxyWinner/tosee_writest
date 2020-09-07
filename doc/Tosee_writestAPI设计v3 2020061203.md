@@ -1702,4 +1702,31 @@ articleId: 123457
 }
 ```
 
-### 
+## 出校篇
+
+### 表单提交
+
+```http
+POST /writester/pass/commitinfo
+```
+
+参数
+
+```json
+name: "王伟"
+institute: "计算机学院（国家示范软件学院）"
+state: "允许入校"
+studentNumber: "2018211457"
+time: "202009051200"
+```
+
+返回
+
+``` json
+{
+    "code": 0,
+    "msg": "成功",
+    "data": {
+    }
+}
+```
